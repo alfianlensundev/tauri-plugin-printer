@@ -1,4 +1,6 @@
-const invoke = window.__TAURI__.invoke
+import { invoke } from '@tauri-apps/api/tauri'
+
+// const invoke = window.__TAURI__.invoke
 /**
  * Get list printers.
  *

@@ -5,7 +5,6 @@ use std::str;
 use std::io::Write;
 use std::fs::File;
 use std::env;
-use std::os::windows::process::CommandExt;
 use tauri::api::process::{Command, CommandEvent};
 
 /**

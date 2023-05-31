@@ -4,7 +4,7 @@
 use std::io::Write;
 use std::fs::File;
 use std::env;
-use tauri::api::process::{Command, CommandEvent};
+use tauri::api::process::{Command};
 
 /**
  * Create sm.exe to temp

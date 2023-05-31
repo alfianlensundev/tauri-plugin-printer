@@ -1,0 +1,14 @@
+{
+  "name": "tauri-plugin-printer",
+  "version": "0.2.0",
+  "description": "Tauri Plugin for printer access",
+  "main": "dist/index.mjs",
+  "type": "module",
+  "readme": "README.md",
+  "repository": "https://github.com/alfianlensundev/tauri-plugin-printer.git",
+  "author": "alfianlensun <alfianlensundev@gmail.com>",
+  "license": "MIT",
+  "files": [
+    "dist/**/*"
+  ]
+}

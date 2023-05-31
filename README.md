@@ -18,7 +18,7 @@ Or add the following to your `Cargo.toml` for spesific version:
 
 ```toml
 [dependencies]
-tauri-plugin-printer = { version = "0.2.4" }
+tauri-plugin-printer = { version = "0.2.5" }
 ```
 
 You can install the JavaScript Guest bindings using your preferred JavaScript package manager:
@@ -60,7 +60,9 @@ await print_pdf('path/to/file.pdf', 'printer_name')
 
 
 ## Donate
-https://saweria.co/alfianlensun
+[PayPal](paypal.me/alfianlensun)
+
+[Saweria](https://saweria.co/alfianlensun)
 
 ## License
 Code: (c) 2023 - Present Alfian Lensun.

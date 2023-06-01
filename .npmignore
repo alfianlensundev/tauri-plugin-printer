@@ -3,3 +3,4 @@ target
 Cargo.toml
 Cargo.lock
 examples
+lib

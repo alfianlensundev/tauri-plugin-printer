@@ -1,5 +1,4 @@
 import { invoke } from '@tauri-apps/api/tauri'
-import { resultprinter } from './mock';
 /**
  * Get list printers.
  *

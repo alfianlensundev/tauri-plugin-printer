@@ -2,3 +2,8 @@ node_modules/
 /target
 /Cargo.lock
 /examples/
+lib/mock.ts
+dist/mock.d.ts
+dist/mock.js
+dist/*.d.ts
+dist/*.js

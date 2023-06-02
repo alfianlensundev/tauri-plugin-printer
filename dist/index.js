@@ -103,8 +103,7 @@ const print_file = async (options) => {
         printer_setting_orientation: printerSettings?.orientation,
         printer_setting_repeat: printerSettings?.repeat,
     };
-    // const print = await invoke('plugin:printer|print_pdf', options)
-    console.log(optionsParams);
-    return "printers";
+    const print = await (0, tauri_1.invoke)('plugin:printer|print_pdf', optionsParams);
+    return print;
 };
 exports.print_file = print_file;

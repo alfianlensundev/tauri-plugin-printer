@@ -20,7 +20,6 @@ fn get_printers() -> String {
 fn print_pdf(
     id: String,
     path: String, 
-    printer_name: String,
     printer_setting_paper: String,
     printer_setting_method: String,
     printer_setting_scale: String,
@@ -30,7 +29,6 @@ fn print_pdf(
   if cfg!(windows) {
     let options = declare::PrintOptions{
         id,
-        name: printer_name,
         path,
         print_setting: declare::PrintSettings{
             paper: printer_setting_paper,

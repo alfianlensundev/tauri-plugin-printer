@@ -51,6 +51,15 @@ const encodeBase64 = (str: string): string => {
         return window.btoa(str)
     }
 }
+const decodeBase64 = (str: string): string => {
+    if (typeof window === "undefined"){
+        // in nodejs
+        return Buffer.from(str, 'base64').toString('utf-8')
+    } else {
+        // in browser
+        return window.atob(str)
+    }
+}
 
 /**
  * Get list printers.
@@ -93,22 +102,36 @@ export const printers = async (): Promise<Printer[]> => {
 export const print_file = async (options: PrintOptions): Promise<any> => {
     if (options.path == undefined) throw new Error('print_file require path as string')  
     if (options.id == undefined && options.name == undefined) throw new Error('print_file require id | name as string')  
-    let id = options.id;
+    let id: string | undefined = "";
 
-    if (options.id == undefined) id = options.name
+    if (typeof options.id != 'undefined'){
+        id = decodeBase64(options.id);
+    } else {
+        id = options.name
+    }
     const printerSettings: PrintSettings = {
         paper: 'A4',
         method: 'simplex',
         scale: 'noscale',
-        orientation: 'portrait'
+        orientation: 'portrait',
+        repeat: 1
     }
 
-    if (options?.print_setting?.paper !== undefined) printerSettings.paper = options.print_setting.paper;
-    if (options?.print_setting?.method !== undefined) printerSettings.method = options.print_setting.method;
-    if (options?.print_setting?.scale !== undefined) printerSettings.scale = options.print_setting.scale;
-    if (options?.print_setting?.orientation !== undefined) printerSettings.orientation = options.print_setting.orientation;
-    if (options?.print_setting?.repeat !== undefined) printerSettings.repeat = options.print_setting.repeat;
+    if (typeof options?.print_setting?.paper != "undefined") printerSettings.paper = options.print_setting.paper;
+    if (typeof options?.print_setting?.method != "undefined") printerSettings.method = options.print_setting.method;
+    if (typeof options?.print_setting?.scale != "undefined") printerSettings.scale = options.print_setting.scale;
+    if (typeof options?.print_setting?.orientation != "undefined") printerSettings.orientation = options.print_setting.orientation;
+    if (typeof options?.print_setting?.repeat != "undefined") printerSettings.repeat = options.print_setting.repeat;
 
-    
-    return printers
+    const optionsParams: any = {
+        id: `"${id}"`,
+        path: options.path, 
+        printer_setting_paper: printerSettings?.paper,
+        printer_setting_method: printerSettings?.method,
+        printer_setting_scale: printerSettings?.scale,
+        printer_setting_orientation: printerSettings?.orientation,
+        printer_setting_repeat: printerSettings?.repeat,
+    }
+    const print = await invoke('plugin:printer|print_pdf', optionsParams)
+    return print
 }

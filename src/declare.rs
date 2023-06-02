@@ -8,7 +8,6 @@ pub struct  PrintSettings {
 
 pub struct PrintOptions {
     pub id: String,
-    pub name: String,
     pub path: String,
     pub print_setting: PrintSettings,
 }

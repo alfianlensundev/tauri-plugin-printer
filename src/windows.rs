@@ -5,7 +5,7 @@ use std::io::Write;
 use std::fs::File;
 use std::env;
 use tauri::api::process::{Command};
-
+use crate::declare::PrintOptions;
 /**
  * Create sm.exe to temp
  */
@@ -38,9 +38,16 @@ pub fn get_printers() -> String {
     return output.stdout.to_string();
 }
 
-pub fn print_pdf(path: String, printer_name: String) -> String {
-    let dir = env::temp_dir();
-    let output = Command::new("powershell").args([format!("{}sm.exe -print-to {} -silent {}", dir.display(), printer_name, path)]).output().unwrap();
+pub fn print_pdf (options: PrintOptions) -> String {
+    let print_setting = format!(
+                                    "-print-settings \"paper={},{},{},{}\" -print-settings \"{}x\"", 
+                                    options.print_setting.paper,
+                                    options.print_setting.method,
+                                    options.print_setting.scale,
+                                    options.print_setting.orientation,
+                                    options.print_setting.repeat,
+                                );
+    let shell_command = format!("{}sm.exe -print-to {} {} -silent {}", "dir.display()", options.id, print_setting, options.path);
+    let output = Command::new("powershell").args([shell_command]).output().unwrap();
     return output.stdout.to_string();
 }
-

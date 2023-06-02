@@ -16,9 +16,30 @@ fn get_printers() -> String {
 
 #[tauri::command(rename_all = "snake_case")]
 // this will be accessible with `invoke('plugin:printer|print_pdf')`.
-fn print_pdf(path: String, printer_name: String) -> String {
+fn print_pdf(
+    id: String,
+    path: String, 
+    printer_name: String,
+    printer_setting_paper: String,
+    printer_setting_method: String,
+    printer_setting_scale: String,
+    printer_setting_orientation: String,
+    printer_setting_repeat: u8,
+) -> String {
   if cfg!(windows) {
-      return windows::print_pdf(path, printer_name);
+    let options = declare::PrintOptions{
+        id,
+        name: printer_name,
+        path,
+        print_setting: declare::PrintSettings{
+            paper: printer_setting_paper,
+            method: printer_setting_method,
+            scale: printer_setting_scale,
+            orientation: printer_setting_orientation,
+            repeat: printer_setting_repeat
+        }
+    };
+    return windows::print_pdf(options);
   }
 
   panic!("Unsupported OS");

@@ -1,9 +1,5 @@
 import { invoke } from '@tauri-apps/api/tauri'
-/**
- * Get list printers.
- *
- * @returns A array of printer detail.
- */
+
 interface Printer {
     id: string;
     name: string;
@@ -17,6 +13,25 @@ interface Printer {
     shared: boolean;
     type: number; // 0: local; 1: connection
     priority: number
+}
+
+type ScaleOption = "noscale" | "shrink" | "fit"
+type MethodOption = "duplex" | "duplexshort" | "simplex"
+type PaperOption = "A2" | "A3" | "A4" | "A5" | "A6" | "letter" | "legal" | "tabloid"
+type OrientationOption = "portrait" | "landscape" 
+
+interface PrintSettings {
+    paper: PaperOption;
+    method: MethodOption;
+    scale?: ScaleOption;
+    orientation?: OrientationOption;
+    repeat?: Number;
+}
+interface PrintOptions {
+    id?: string;
+    name?: string;
+    path: string;
+    print_setting?: PrintSettings;
 }
 
 const parseIfJSON = (str: string): any => {
@@ -37,6 +52,11 @@ const encodeBase64 = (str: string): string => {
     }
 }
 
+/**
+ * Get list printers.
+ *
+ * @returns A array of printer detail.
+ */
 export const printers = async (): Promise<Printer[]> => {
     const result: string = await invoke('plugin:printer|get_printers')
     
@@ -63,5 +83,32 @@ export const printers = async (): Promise<Printer[]> => {
             priority: item.Priority
         })
     }
+    return printers
+}
+/**
+ * Get list printers.
+ * @params first_param: File Path, second_param: Print Setting
+ * @returns A array of printer detail.
+ */
+export const print_file = async (options: PrintOptions): Promise<any> => {
+    if (options.path == undefined) throw new Error('print_file require path as string')  
+    if (options.id == undefined && options.name == undefined) throw new Error('print_file require id | name as string')  
+    let id = options.id;
+
+    if (options.id == undefined) id = options.name
+    const printerSettings: PrintSettings = {
+        paper: 'A4',
+        method: 'simplex',
+        scale: 'noscale',
+        orientation: 'portrait'
+    }
+
+    if (options?.print_setting?.paper !== undefined) printerSettings.paper = options.print_setting.paper;
+    if (options?.print_setting?.method !== undefined) printerSettings.method = options.print_setting.method;
+    if (options?.print_setting?.scale !== undefined) printerSettings.scale = options.print_setting.scale;
+    if (options?.print_setting?.orientation !== undefined) printerSettings.orientation = options.print_setting.orientation;
+    if (options?.print_setting?.repeat !== undefined) printerSettings.repeat = options.print_setting.repeat;
+
+    
     return printers
 }

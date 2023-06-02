@@ -1,3 +1,5 @@
-test('adds 1 + 2 to equal 3', () => {
-    expect(3).toBe(3);
+const {printers} = require('../dist/index')
+test('Get printer', async () => {
+    const result = await printers()
+    expect(result.length).not.toBe(undefined)
 });

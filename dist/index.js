@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.printers = void 0;
-const tauri_1 = require("@tauri-apps/api/tauri");
+const mock_1 = require("./mock");
 const parseIfJSON = (str) => {
     try {
         return JSON.parse(str);
@@ -10,14 +10,27 @@ const parseIfJSON = (str) => {
         return [];
     }
 };
+const encodeBase64 = (str) => {
+    if (typeof window === "undefined") {
+        // in nodejs
+        return Buffer.from(str, 'utf-8').toString('base64');
+    }
+    else {
+        // in browser
+        return window.btoa(str);
+    }
+};
 const printers = async () => {
-    const result = await (0, tauri_1.invoke)('plugin:printer|get_printers');
+    // const result: string = await invoke('plugin:printer|get_printers')
+    const result = mock_1.resultprinter;
     const listRaw = parseIfJSON(result);
     const printers = [];
     for (let i = 0; i < listRaw.length; i++) {
         const item = listRaw[i];
+        const id = encodeBase64(item.Name);
         printers.push({
-            raw_name: item.Name,
+            id,
+            name: item.Name,
             driver_name: item.DriverName,
             job_count: item.JobCount,
             print_processor: item.PrintProcessor,

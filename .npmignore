@@ -4,3 +4,4 @@ Cargo.toml
 Cargo.lock
 examples
 lib
+test

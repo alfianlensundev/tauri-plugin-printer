@@ -4,7 +4,8 @@
  * @returns A array of printer detail.
  */
 interface Printer {
-    raw_name: string;
+    id: string;
+    name: string;
     driver_name: string;
     job_count: number;
     print_processor: string;

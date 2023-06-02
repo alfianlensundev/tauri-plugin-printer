@@ -1,11 +1,13 @@
 import { invoke } from '@tauri-apps/api/tauri'
+import { resultprinter } from './mock';
 /**
  * Get list printers.
  *
  * @returns A array of printer detail.
  */
 interface Printer {
-    raw_name: string;
+    id: string;
+    name: string;
     driver_name: string;
     job_count: number;
     print_processor: string;
@@ -25,16 +27,31 @@ const parseIfJSON = (str: string): any => {
         return []
     }
 }
+
+const encodeBase64 = (str: string): string => {
+    if (typeof window === "undefined"){
+        // in nodejs
+        return Buffer.from(str, 'utf-8').toString('base64')
+    } else {
+        // in browser
+        return window.btoa(str)
+    }
+}
+
 export const printers = async (): Promise<Printer[]> => {
     const result: string = await invoke('plugin:printer|get_printers')
-
+    
+    
     const listRaw: any[] = parseIfJSON(result)
     const printers: Printer[] = [];
 
     for (let i = 0; i<listRaw.length; i++){
         const item: any = listRaw[i]
+        const id = encodeBase64(item.Name);
+        
         printers.push({
-            raw_name: item.Name,
+            id,
+            name: item.Name,
             driver_name: item.DriverName,
             job_count: item.JobCount,
             print_processor: item.PrintProcessor,

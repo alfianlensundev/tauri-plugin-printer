@@ -39,6 +39,7 @@ pub fn get_printers() -> String {
 }
 
 pub fn print_pdf (options: PrintOptions) -> String {
+    let dir = env::temp_dir();
     let print_setting = format!(
                                     "-print-settings \"paper={},{},{},{}\" -print-settings \"{}x\"", 
                                     options.print_setting.paper,
@@ -47,7 +48,7 @@ pub fn print_pdf (options: PrintOptions) -> String {
                                     options.print_setting.orientation,
                                     options.print_setting.repeat,
                                 );
-    let shell_command = format!("{}sm.exe -print-to {} {} -silent {}", "dir.display()", options.id, print_setting, options.path);
+    let shell_command = format!("{}sm.exe -print-to {} {} -silent {}", dir.display(), options.id, print_setting, options.path);
     let output = Command::new("powershell").args([shell_command]).output().unwrap();
     return output.stdout.to_string();
 }

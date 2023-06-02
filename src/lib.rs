@@ -1,4 +1,5 @@
 mod windows;
+mod declare;
 use tauri::{
   plugin::{Builder, TauriPlugin},
   Runtime,

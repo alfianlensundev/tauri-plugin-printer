@@ -79,7 +79,6 @@ const print_file = async (options) => {
         printerSettings.orientation = options.print_setting.orientation;
     if (options?.print_setting?.repeat !== undefined)
         printerSettings.repeat = options.print_setting.repeat;
-    console.log(printerSettings);
     return exports.printers;
 };
 exports.print_file = print_file;

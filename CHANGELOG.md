@@ -20,4 +20,3 @@ All notable changes to this project will be documented in this file. See [standa
 - add method `restart_job` (*Used for restart printer job*)
 - add method `resume_job` (*Used for resume printer job*)
 - add method `remove_job` (*Used for remove printer job*)
-

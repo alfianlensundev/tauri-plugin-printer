@@ -12,11 +12,15 @@ All notable changes to this project will be documented in this file. See [standa
 ### Added
 
 #### Spesifik Windows
-- add method `add_printer` (*Used for add printer*)
-- add method `remove_printer` (*Used for remove printer*)
 - add method `print_file` (*Used for print file*)
 - add method `printers` (*Used for get list printers*)  
-- add method `job` (*Used for get printer job*)
-- add method `restart_job` (*Used for restart printer job*)
-- add method `resume_job` (*Used for resume printer job*)
-- add method `remove_job` (*Used for remove printer job*)
+
+
+
+### WIP
+- method `add_printer` (*Used for printer*)
+- method `remove_printer` (*Used for remove printer*)
+- method `job` (*Used for get printer job*)
+- method `restart_job` (*Used for restart printer job*)
+- method `resume_job` (*Used for resume printer job*)
+- method `remove_job` (*Used for remove printer job*)

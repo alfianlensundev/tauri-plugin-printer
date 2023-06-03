@@ -54,7 +54,17 @@ import {list_printers} from "tauri-plugin-printer";
 const list = await list_printers()
 
 // print pdf file
-await print_pdf('path/to/file.pdf', 'printer_name')
+await print_file({
+    id: "idfromlistprinter",
+    path: 'F:/path/to/file.pdf',
+    print_setting: {
+        orientation: "landscape",
+        method: "simplex", // duplex \ simplex | duplexshort
+        paper: "A4", // "A2" | "A3" | "A4" | "A5" | "A6" | "letter" | "legal" | "tabloid"
+        scale: "noscale", //"noscale" | "shrink" | "fit"
+        repeat: 1 // "noscale" | "shrink" | "fit"
+    }
+})
 
 ```
 

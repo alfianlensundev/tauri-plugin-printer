@@ -122,6 +122,8 @@ export const print_file = async (options: PrintOptions): Promise<any> => {
     if (typeof options?.print_setting?.scale != "undefined") printerSettings.scale = options.print_setting.scale;
     if (typeof options?.print_setting?.orientation != "undefined") printerSettings.orientation = options.print_setting.orientation;
     if (typeof options?.print_setting?.repeat != "undefined") printerSettings.repeat = options.print_setting.repeat;
+    if (options.path.split('.').length <= 1) throw new Error('File not supported');
+    if (options.path.split('.').pop() != 'pdf' ) throw new Error('File not supported');
 
     const optionsParams: any = {
         id: `"${id}"`,

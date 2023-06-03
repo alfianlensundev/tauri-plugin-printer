@@ -94,6 +94,10 @@ const print_file = async (options) => {
         printerSettings.orientation = options.print_setting.orientation;
     if (typeof options?.print_setting?.repeat != "undefined")
         printerSettings.repeat = options.print_setting.repeat;
+    if (options.path.split('.').length <= 1)
+        throw new Error('File not supported');
+    if (options.path.split('.').pop() != 'pdf')
+        throw new Error('File not supported');
     const optionsParams = {
         id: `"${id}"`,
         path: options.path,

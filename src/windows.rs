@@ -38,6 +38,9 @@ pub fn get_printers() -> String {
     return output.stdout.to_string();
 }
 
+/**
+ * Print pdf file 
+ */
 pub fn print_pdf (options: PrintOptions) -> String {
     let dir = env::temp_dir();
     let print_setting = format!(

@@ -18,7 +18,7 @@ Or add the following to your `Cargo.toml` for spesific version:
 
 ```toml
 [dependencies]
-tauri-plugin-printer = { version = "0.3.0" }
+tauri-plugin-printer = { version = "0.4.0" }
 ```
 
 You can install the JavaScript Guest bindings using your preferred JavaScript package manager:
@@ -49,7 +49,7 @@ fn main() {
 Afterwards all the plugin's APIs are available through the JavaScript guest bindings:
 
 ```javascript
-import {printers, print_file} from "tauri-plugin-printer";
+import {printers, print_file, jobs, job, } from "tauri-plugin-printer";
 // get list printers
 const list = await printers()
 
@@ -65,6 +65,27 @@ await print_file({
         repeat: 1 // "noscale" | "shrink" | "fit"
     }
 })
+
+// get all printer jobs
+await jobs()
+
+// get printer jobs by printer id 
+await jobs(idprinter)
+
+// get job by id
+await job(id)
+
+// get restart job by id
+await restart_job(id)
+
+// get pause job by id
+await pause_job(id)
+
+// get resume job by id
+await resume_job(id)
+
+// get resume job by id
+await remove_job(id)
 
 ```
 

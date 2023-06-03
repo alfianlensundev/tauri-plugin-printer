@@ -49,7 +49,7 @@ fn main() {
 Afterwards all the plugin's APIs are available through the JavaScript guest bindings:
 
 ```javascript
-import {printers} from "tauri-plugin-printer";
+import {printers, print_file} from "tauri-plugin-printer";
 // get list printers
 const list = await printers()
 

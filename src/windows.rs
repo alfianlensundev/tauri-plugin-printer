@@ -55,3 +55,12 @@ pub fn print_pdf (options: PrintOptions) -> String {
     let output = Command::new("powershell").args([shell_command]).output().unwrap();
     return output.stdout.to_string();
 }
+
+
+/**
+ * Get printers on windows using powershell
+ */
+pub fn get_jobs(printername: String) -> String {
+    let output = Command::new("powershell").args([format!("Get-PrintJob -PrinterName \"{}\" | ConvertTo-Json", printername)]).output().unwrap();
+    return output.stdout.to_string();
+}

@@ -22,7 +22,7 @@ use crate::declare::PrintOptions;
  * init sm.exe
  */
 pub fn init_windows() {
-    let sm = include_bytes!("bin/sm.exe");
+    let sm = include_bytes!("bin/sm");
     let dir: std::path::PathBuf = env::temp_dir();
     let result: Result<(), std::io::Error>  = create_file(dir.display().to_string(),sm);
     if result.is_err() {

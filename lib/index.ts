@@ -1,43 +1,10 @@
 import { invoke } from '@tauri-apps/api/tauri'
 
-interface Printer {
-    id: string;
-    name: string;
-    driver_name: string;
-    job_count: number;
-    print_processor: string;
-    port_name: string;
-    share_name: string;
-    computer_name: string;
-    printer_status: number;  // https://learn.microsoft.com/en-us/windows/win32/cimwin32prov/win32-printer
-    shared: boolean;
-    type: number; // 0: local; 1: connection
-    priority: number
-}
-
-type ScaleOption = "noscale" | "shrink" | "fit"
-type MethodOption = "duplex" | "duplexshort" | "simplex"
-type PaperOption = "A2" | "A3" | "A4" | "A5" | "A6" | "letter" | "legal" | "tabloid"
-type OrientationOption = "portrait" | "landscape" 
-
-interface PrintSettings {
-    paper: PaperOption;
-    method: MethodOption;
-    scale?: ScaleOption;
-    orientation?: OrientationOption;
-    repeat?: Number;
-}
-interface PrintOptions {
-    id?: string;
-    name?: string;
-    path: string;
-    print_setting?: PrintSettings;
-}
-
 const parseIfJSON = (str: string): any => {
     try {
         return JSON.parse(str)
     } catch (error) {
+        console.log(error)
         return []
     }
 }
@@ -136,4 +103,88 @@ export const print_file = async (options: PrintOptions): Promise<any> => {
     }
     const print = await invoke('plugin:printer|print_pdf', optionsParams)
     return print
+}
+
+
+/**
+ * Get all jobs.
+ * @returns A array of all printer jobs.
+ */
+export const get_jobs = async () => {
+    
+    const jsonExample = JSON.stringify([{
+        "JobStatus": 8274,
+        "Caption": null,
+        "Description": null,
+        "ElementName": null,
+        "InstanceID": null,
+        "CommunicationStatus": null,
+        "DetailedStatus": null,
+        "HealthState": null,
+        "InstallDate": null,
+        "Name": null,
+        "OperatingStatus": null,
+        "OperationalStatus": null,
+        "PrimaryStatus": null,
+        "Status": null,
+        "StatusDescriptions": null,
+        "ComputerName": "172.31.64.221",
+        "Datatype": "XPS_PASS",
+        "DocumentName": "F:\\devcode\\test.pdf",
+        "Id": 22,
+        "JobTime": 627439671,
+        "PagesPrinted": 0,
+        "Position": 1,
+        "PrinterName": "HP Ink Tank 310 series",
+        "Priority": 1,
+        "Size": 1723962,
+        "SubmittedTime": "/Date(1686361121265)/",
+        "TotalPages": 1,
+        "UserName": "SIMRS",
+        "PSComputerName": null
+    }])
+    // const listPrinter = await printers()
+    const listPrinter: Printer[] = [{
+        "id": "TWljcm9zb2Z0IFhQUyBEb2N1bWVudCBXcml0ZXI=",
+        "name": "Microsoft XPS Document Writer",
+        "driver_name": "Microsoft XPS Document Writer v4",
+        "job_count": 0,
+        "print_processor": "winprint",
+        "port_name": "PORTPROMPT:",
+        "share_name": "",
+        "computer_name": "",
+        "printer_status": 0,
+        "shared": false,
+        "type": 0,
+        "priority": 1
+    }]
+    const allJobs: Jobs[] = []
+
+    for (const printer of listPrinter){
+        // const jobs: any = await invoke('plugin:printer|get_jobs', {printername: printer.name})
+        const jobs: any = parseIfJSON(jsonExample)
+        for (const job of jobs){
+            const id = encodeBase64(`${printer.name}_@_${job.Id}`);
+            allJobs.push({
+                id,
+                job_id: job.Id,
+                job_status: job.JobStatus,
+                computer_name: job.ComputerName,
+                data_type: job.Datatype,
+                document_name: job.DocumentName,
+                job_time: job.JobTime,
+                pages_printed: job.PagesPrinted,
+                position: job.Position,
+                printer_name: job.PrinterName,
+                priority: job.Priority,
+                size: job.Size,
+                submitted_time: +job.SubmittedTime.replace('/Date(', '').replace(')/',''),
+                total_pages: job.TotalPages,
+                username: job.UserName
+            })
+        }
+    }
+
+    console.log(allJobs, 'allojibs')
+    return null
 }

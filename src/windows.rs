@@ -75,7 +75,7 @@ pub fn restart_job(printername: String, jobid: String) -> String {
 }
 
 /**
- * Restart printers job on windows using powershell
+ * pause printers job on windows using powershell
  */
 pub fn pause_job(printername: String, jobid: String) -> String {
     let output = Command::new("powershell").args([format!("Restart-PrintJob -PrinterName \"{}\" -ID \"{}\" ", printername, jobid)]).output().unwrap();
@@ -83,7 +83,7 @@ pub fn pause_job(printername: String, jobid: String) -> String {
 }
 
 /**
- * Restart printers job on windows using powershell
+ * remove printers job on windows using powershell
  */
 pub fn remove_job(printername: String, jobid: String) -> String {
     let output = Command::new("powershell").args([format!("Remove-PrintJob -PrinterName \"{}\" -ID \"{}\" ", printername, jobid)]).output().unwrap();

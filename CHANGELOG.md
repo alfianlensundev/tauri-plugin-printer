@@ -9,12 +9,12 @@ All notable changes to this project will be documented in this file. See [standa
 - method `remove_printer` (*Used for remove printer*)
 
 ## v0.4.0
-[Compare changes](https://github.com/alfianlensundev/tauri-plugin-printer/compare/v0.2.6...v0.3.0)
+[Compare changes](https://github.com/alfianlensundev/tauri-plugin-printer/compare/v0.3.0...v0.4.0)
 
 ### Added
 
 #### Spesifik Windows
-- add method `jobs` (*Used for get printer jobs*)
+- add method `jobs` (*Used for get all printer jobs*)
 - add method `job` (*Used for get printer job by id*)
 - add method `restart_job` (*Used restart printer job*) 
 - add method `pause_job` (*Used pause printer job*) 

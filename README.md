@@ -1,7 +1,5 @@
 # Tauri Plugin Printer
-Interface with printers through [Powershell](https://learn.microsoft.com/en-us/powershell/scripting/install/installing-powershell-on-windows?view=powershell-7.3), enabled by a Cargo feature
-
-_This plugin is currently under development, any bugs please understand_
+Interface with printers through [Powershell](https://learn.microsoft.com/en-us/powershell/scripting/install/installing-powershell-on-windows?view=powershell-7.3)
 
 ## Install
 > If you are installing from npm and crate.io package registry, make sure the mayor and minor versions for both packages are the same, otherwise, the API may not match.

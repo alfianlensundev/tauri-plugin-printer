@@ -47,7 +47,7 @@ fn main() {
 Afterwards all the plugin's APIs are available through the JavaScript guest bindings:
 
 ```javascript
-import {printers, print_file, jobs, job, } from "tauri-plugin-printer";
+import {printers, print_file, jobs, job, restart_job, pause_job, resume_job, remove_job} from "tauri-plugin-printer";
 
 // get list printers
 const list = await printers()
@@ -61,7 +61,7 @@ await print_file({
     path: 'F:/path/to/file.pdf',
     print_setting: {
         orientation: "landscape",
-        method: "simplex", // duplex \ simplex | duplexshort
+        method: "simplex", // duplex | simplex | duplexshort
         paper: "A4", // "A2" | "A3" | "A4" | "A5" | "A6" | "letter" | "legal" | "tabloid"
         scale: "noscale", //"noscale" | "shrink" | "fit"
         repeat: 1 // "noscale" | "shrink" | "fit"

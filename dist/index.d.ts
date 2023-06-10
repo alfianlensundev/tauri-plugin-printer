@@ -14,4 +14,4 @@ export declare const print_file: (options: PrintOptions) => Promise<any>;
  * Get all jobs.
  * @returns A array of all printer jobs.
  */
-export declare const get_jobs: () => Promise<Jobs[]>;
+export declare const jobs: () => Promise<Jobs[]>;

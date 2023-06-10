@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.get_jobs = exports.print_file = exports.printers = void 0;
+exports.jobs = exports.print_file = exports.printers = void 0;
 const tauri_1 = require("@tauri-apps/api/tauri");
 const parseIfJSON = (str) => {
     try {
@@ -116,12 +116,12 @@ exports.print_file = print_file;
  * Get all jobs.
  * @returns A array of all printer jobs.
  */
-const get_jobs = async () => {
+const jobs = async () => {
     const listPrinter = await (0, exports.printers)();
     const allJobs = [];
     for (const printer of listPrinter) {
-        const jobs = await (0, tauri_1.invoke)('plugin:printer|get_jobs', { printername: printer.name });
-        for (const job of jobs) {
+        const listRawJobs = await (0, tauri_1.invoke)('plugin:printer|get_jobs', { printername: printer.name });
+        for (const job of listRawJobs) {
             const id = encodeBase64(`${printer.name}_@_${job.Id}`);
             allJobs.push({
                 id,
@@ -143,4 +143,4 @@ const get_jobs = async () => {
     }
     return allJobs;
 };
-exports.get_jobs = get_jobs;
+exports.jobs = jobs;

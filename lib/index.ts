@@ -111,13 +111,13 @@ export const print_file = async (options: PrintOptions): Promise<any> => {
  * Get all jobs.
  * @returns A array of all printer jobs.
  */
-export const get_jobs = async () => {
+export const jobs = async () => {
     const listPrinter = await printers()
     const allJobs: Jobs[] = []
 
     for (const printer of listPrinter){
-        const jobs: any = await invoke('plugin:printer|get_jobs', {printername: printer.name})
-        for (const job of jobs){
+        const listRawJobs: any = await invoke('plugin:printer|get_jobs', {printername: printer.name})
+        for (const job of listRawJobs){
             const id = encodeBase64(`${printer.name}_@_${job.Id}`);
             allJobs.push({
                 id,

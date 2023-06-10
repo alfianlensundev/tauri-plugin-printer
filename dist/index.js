@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.get_jobs = exports.print_file = exports.printers = void 0;
 const tauri_1 = require("@tauri-apps/api/tauri");
+const constants_1 = require("./constants");
 const parseIfJSON = (str) => {
     try {
         return JSON.parse(str);
@@ -117,62 +118,24 @@ exports.print_file = print_file;
  * @returns A array of all printer jobs.
  */
 const get_jobs = async () => {
-    const jsonExample = JSON.stringify([{
-            "JobStatus": 8274,
-            "Caption": null,
-            "Description": null,
-            "ElementName": null,
-            "InstanceID": null,
-            "CommunicationStatus": null,
-            "DetailedStatus": null,
-            "HealthState": null,
-            "InstallDate": null,
-            "Name": null,
-            "OperatingStatus": null,
-            "OperationalStatus": null,
-            "PrimaryStatus": null,
-            "Status": null,
-            "StatusDescriptions": null,
-            "ComputerName": "172.31.64.221",
-            "Datatype": "XPS_PASS",
-            "DocumentName": "F:\\devcode\\test.pdf",
-            "Id": 22,
-            "JobTime": 627439671,
-            "PagesPrinted": 0,
-            "Position": 1,
-            "PrinterName": "HP Ink Tank 310 series",
-            "Priority": 1,
-            "Size": 1723962,
-            "SubmittedTime": "/Date(1686361121265)/",
-            "TotalPages": 1,
-            "UserName": "SIMRS",
-            "PSComputerName": null
-        }]);
-    // const listPrinter = await printers()
-    const listPrinter = [{
-            "id": "TWljcm9zb2Z0IFhQUyBEb2N1bWVudCBXcml0ZXI=",
-            "name": "Microsoft XPS Document Writer",
-            "driver_name": "Microsoft XPS Document Writer v4",
-            "job_count": 0,
-            "print_processor": "winprint",
-            "port_name": "PORTPROMPT:",
-            "share_name": "",
-            "computer_name": "",
-            "printer_status": 0,
-            "shared": false,
-            "type": 0,
-            "priority": 1
-        }];
+    const listPrinter = await (0, exports.printers)();
     const allJobs = [];
     for (const printer of listPrinter) {
-        // const jobs: any = await invoke('plugin:printer|get_jobs', {printername: printer.name})
-        const jobs = parseIfJSON(jsonExample);
+        const jobs = await (0, tauri_1.invoke)('plugin:printer|get_jobs', { printername: printer.name });
         for (const job of jobs) {
             const id = encodeBase64(`${printer.name}_@_${job.Id}`);
             allJobs.push({
                 id,
                 job_id: job.Id,
-                job_status: job.JobStatus,
+                job_status: constants_1.jobStatus[job.JobStatus] != undefined ? {
+                    code: job.JobStatus,
+                    description: constants_1.jobStatus[job.JobStatus].description,
+                    name: constants_1.jobStatus[job.JobStatus].name
+                } : {
+                    code: job.JobStatus,
+                    description: "Unknown Job Status",
+                    name: "Unknown"
+                },
                 computer_name: job.ComputerName,
                 data_type: job.Datatype,
                 document_name: job.DocumentName,
@@ -188,7 +151,6 @@ const get_jobs = async () => {
             });
         }
     }
-    console.log(allJobs, 'allojibs');
-    return null;
+    return allJobs;
 };
 exports.get_jobs = get_jobs;

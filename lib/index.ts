@@ -222,8 +222,8 @@ export const restart_job = async (jobid: string|null = null): Promise<ResponseRe
         }
         if (jobid != null){
             const idextract = decodeBase64(jobid)
-            if (idextract.length != 2) throw new Error('Wrong jobid')
-            const [printername, id] = idextract.split('_@_')
+            const [printername = null, id = null] = idextract.split('_@_')
+            if (printername == null || id == null) throw new Error('Wrong jobid')
 
             await invoke('plugin:printer|restart_job', {
                 printername, 
@@ -250,6 +250,94 @@ export const restart_job = async (jobid: string|null = null): Promise<ResponseRe
         return {
             success: false,
             message: err.message ? err.message : "Fail to restart job"
+        }
+    }
+}
+
+/**
+ * Resume jobs.
+ * @param jobid
+ */
+export const resume_job = async (jobid: string|null = null): Promise<ResponseResult> => {
+    try {
+        const result = {
+            success: true,
+            message: "OK"
+        }
+        if (jobid != null){
+            const idextract = decodeBase64(jobid)
+            const [printername = null, id = null] = idextract.split('_@_')
+            if (printername == null || id == null) throw new Error('Wrong jobid')
+
+            await invoke('plugin:printer|resume_job', {
+                printername, 
+                jobid: id
+            })
+
+            return result;
+        }
+
+        const listPrinter = await printers()    
+        for (const printer of listPrinter){
+            const result: any = await invoke('plugin:printer|get_jobs', {printername: printer.name})
+            const listRawJobs = parseIfJSON(result)
+            for (const job of listRawJobs){
+                await invoke('plugin:printer|resume_job', {
+                    printername: printer.name, 
+                    jobid: job.Id
+                })
+            }
+        }
+
+        return result
+    } catch (err: any) {
+        return {
+            success: false,
+            message: err.message ? err.message : "Fail to resume job"
+        }
+    }
+}
+
+/**
+ * Pause jobs.
+ * @param jobid
+ */
+export const pause_job = async (jobid: string|null = null): Promise<ResponseResult> => {
+    try {
+        const result = {
+            success: true,
+            message: "OK"
+        }
+        if (jobid != null){
+            const idextract = decodeBase64(jobid)
+            const [printername = null, id = null] = idextract.split('_@_')
+            if (printername == null || id == null) throw new Error('Wrong jobid')
+
+            await invoke('plugin:printer|pause_job', {
+                printername, 
+                jobid: id
+            })
+
+            return result;
+        }
+
+        const listPrinter = await printers()    
+        for (const printer of listPrinter){
+            const result: any = await invoke('plugin:printer|get_jobs', {printername: printer.name})
+            const listRawJobs = parseIfJSON(result)
+            for (const job of listRawJobs){
+                await invoke('plugin:printer|pause_job', {
+                    printername: printer.name, 
+                    jobid: job.Id
+                })
+            }
+        }
+
+        return result
+    } catch (err: any) {
+        return {
+            success: false,
+            message: err.message ? err.message : "Fail to pause job"
         }
     }
 }

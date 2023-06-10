@@ -66,6 +66,15 @@ fn get_jobs(printername: String) -> String {
 
 #[tauri::command(rename_all = "snake_case")]
 // this will be accessible with `invoke('plugin:printer|restart_job')`.
+fn resume_job(printername: String, jobid: String) -> String {
+  if cfg!(windows) {
+    return windows::resume_job(printername,jobid);
+  }
+  panic!("Unsupported OS");
+}
+
+#[tauri::command(rename_all = "snake_case")]
+// this will be accessible with `invoke('plugin:printer|restart_job')`.
 fn restart_job(printername: String, jobid: String) -> String {
   if cfg!(windows) {
     return windows::restart_job(printername,jobid);

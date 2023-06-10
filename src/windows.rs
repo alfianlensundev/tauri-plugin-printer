@@ -75,6 +75,14 @@ pub fn get_jobs(printername: String) -> String {
 
 
 /**
+ * Resume printers job on windows using powershell
+ */
+pub fn resume_job(printername: String, jobid: String) -> String {
+    let output = Command::new("powershell").args([format!("Resume-PrintJob -PrinterName \"{}\" -ID \"{}\" ", printername, jobid)]).output().unwrap();
+    return output.stdout.to_string();
+}
+
+/**
  * Restart printers job on windows using powershell
  */
 pub fn restart_job(printername: String, jobid: String) -> String {

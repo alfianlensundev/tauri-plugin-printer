@@ -20,3 +20,13 @@ export declare const jobs: (printerid?: string | null) => Promise<Jobs[]>;
  * @param jobid
  */
 export declare const restart_job: (jobid?: string | null) => Promise<ResponseResult>;
+/**
+ * Resume jobs.
+ * @param jobid
+ */
+export declare const resume_job: (jobid?: string | null) => Promise<ResponseResult>;
+/**
+ * Pause jobs.
+ * @param jobid
+ */
+export declare const pause_job: (jobid?: string | null) => Promise<ResponseResult>;

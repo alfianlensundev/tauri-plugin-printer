@@ -48,8 +48,12 @@ Afterwards all the plugin's APIs are available through the JavaScript guest bind
 
 ```javascript
 import {printers, print_file, jobs, job, } from "tauri-plugin-printer";
+
 // get list printers
 const list = await printers()
+
+// get printer by id
+const list = await printers(id)
 
 // print pdf file
 await print_file({

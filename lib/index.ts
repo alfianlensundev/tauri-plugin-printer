@@ -1,12 +1,11 @@
 import { invoke } from '@tauri-apps/api/tauri'
 import { jobStatus } from './constants'
 
-const parseIfJSON = (str: string): any => {
+const parseIfJSON = (str: string, dft: any = []): any => {
     try {
         return JSON.parse(str)
     } catch (error) {
-        console.log(error)
-        return []
+        return dft
     }
 }
 
@@ -34,10 +33,32 @@ const decodeBase64 = (str: string): string => {
  *
  * @returns A array of printer detail.
  */
-export const printers = async (): Promise<Printer[]> => {
+export const printers = async (id: string|null = null): Promise<Printer[]> => {
+    if (id != null){
+        const printername = id = decodeBase64(id);
+        const result: string = await invoke('plugin:printer|get_printers_by_name', {
+            printername
+        })
+        const item = parseIfJSON(result, null);
+        if (item == null) return [];
+        return [
+            {
+                id,
+                name: item.Name,
+                driver_name: item.DriverName,
+                job_count: item.JobCount,
+                print_processor: item.PrintProcessor,
+                port_name: item.PortName,
+                share_name: item.ShareName,
+                computer_name: item.ComputerName,
+                printer_status: item.PrinterStatus, 
+                shared: item.Shared,
+                type: item.Type,
+                priority: item.Priority
+            }
+        ]
+    }
     const result: string = await invoke('plugin:printer|get_printers')
-    
-    
     const listRaw: any[] = parseIfJSON(result)
     const printers: Printer[] = [];
 
@@ -111,9 +132,45 @@ export const print_file = async (options: PrintOptions): Promise<any> => {
  * Get all jobs.
  * @returns A array of all printer jobs.
  */
-export const jobs = async () => {
-    const listPrinter = await printers()
+export const jobs = async (printerid: string|null = null): Promise<Jobs[]> => {
     const allJobs: Jobs[] = []
+    if (printerid != null){
+        const printer = await printers(printerid)    
+        if (printer.length == 0) return []
+        const result: any = await invoke('plugin:printer|get_jobs', {printername: printer[0].name})
+        const listRawJobs = parseIfJSON(result)
+        for (const job of listRawJobs){
+            const id = encodeBase64(`${printer[0].name}_@_${job.Id}`);
+            allJobs.push({
+                id,
+                job_id: job.Id,
+                job_status: jobStatus[job.JobStatus] != undefined ? {
+                    code: job.JobStatus,
+                    description: jobStatus[job.JobStatus].description,
+                    name: jobStatus[job.JobStatus].name
+                }: {
+                    code: job.JobStatus,
+                    description: "Unknown Job Status",
+                    name: "Unknown"
+                },
+                computer_name: job.ComputerName,
+                data_type: job.Datatype,
+                document_name: job.DocumentName,
+                job_time: job.JobTime,
+                pages_printed: job.PagesPrinted,
+                position: job.Position,
+                printer_name: job.PrinterName,
+                priority: job.Priority,
+                size: job.Size,
+                submitted_time: job.SubmittedTime ? +job.SubmittedTime?.replace('/Date(', '')?.replace(')/','') : null,
+                total_pages: job.TotalPages,
+                username: job.UserName
+            })
+        }
+        return allJobs;
+    }
+    const listPrinter = await printers()
+    
 
     for (const printer of listPrinter){
         const result: any = await invoke('plugin:printer|get_jobs', {printername: printer.name})

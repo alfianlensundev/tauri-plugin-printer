@@ -3,13 +3,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.jobs = exports.print_file = exports.printers = void 0;
 const tauri_1 = require("@tauri-apps/api/tauri");
 const constants_1 = require("./constants");
-const parseIfJSON = (str) => {
+const parseIfJSON = (str, dft = []) => {
     try {
         return JSON.parse(str);
     }
     catch (error) {
-        console.log(error);
-        return [];
+        return dft;
     }
 };
 const encodeBase64 = (str) => {
@@ -37,7 +36,32 @@ const decodeBase64 = (str) => {
  *
  * @returns A array of printer detail.
  */
-const printers = async () => {
+const printers = async (id = null) => {
+    if (id != null) {
+        const printername = id = decodeBase64(id);
+        const result = await (0, tauri_1.invoke)('plugin:printer|get_printers_by_name', {
+            printername
+        });
+        const item = parseIfJSON(result, null);
+        if (item == null)
+            return [];
+        return [
+            {
+                id,
+                name: item.Name,
+                driver_name: item.DriverName,
+                job_count: item.JobCount,
+                print_processor: item.PrintProcessor,
+                port_name: item.PortName,
+                share_name: item.ShareName,
+                computer_name: item.ComputerName,
+                printer_status: item.PrinterStatus,
+                shared: item.Shared,
+                type: item.Type,
+                priority: item.Priority
+            }
+        ];
+    }
     const result = await (0, tauri_1.invoke)('plugin:printer|get_printers');
     const listRaw = parseIfJSON(result);
     const printers = [];
@@ -117,7 +141,7 @@ exports.print_file = print_file;
  * Get all jobs.
  * @returns A array of all printer jobs.
  */
-const jobs = async () => {
+const jobs = async (printername = null) => {
     const listPrinter = await (0, exports.printers)();
     const allJobs = [];
     for (const printer of listPrinter) {

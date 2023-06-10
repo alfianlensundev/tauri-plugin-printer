@@ -3,7 +3,7 @@
  *
  * @returns A array of printer detail.
  */
-export declare const printers: () => Promise<Printer[]>;
+export declare const printers: (id?: string | null) => Promise<Printer[]>;
 /**
  * Get list printers.
  * @params first_param: File Path, second_param: Print Setting
@@ -14,4 +14,4 @@ export declare const print_file: (options: PrintOptions) => Promise<any>;
  * Get all jobs.
  * @returns A array of all printer jobs.
  */
-export declare const jobs: () => Promise<Jobs[]>;
+export declare const jobs: (printername?: string | null) => Promise<Jobs[]>;

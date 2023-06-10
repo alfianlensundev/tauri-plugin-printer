@@ -39,6 +39,14 @@ pub fn get_printers() -> String {
 }
 
 /**
+ * Get printers by name on windows using powershell
+ */
+pub fn get_printers_by_name(printername: String) -> String {
+    let output = Command::new("powershell").args([format!("Get-Printer -Name \"{}\" | ConvertTo-Json", printername)]).output().unwrap();
+    return output.stdout.to_string();
+}
+
+/**
  * Print pdf file 
  */
 pub fn print_pdf (options: PrintOptions) -> String {

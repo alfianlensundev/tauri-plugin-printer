@@ -16,6 +16,16 @@ fn get_printers() -> String {
 }
 
 #[tauri::command(rename_all = "snake_case")]
+// this will be accessible with `invoke('plugin:printer|get_printer_by_name')`.
+fn get_printers_by_name(printername: String) -> String {
+  if cfg!(windows) {
+      return windows::get_printers_by_name(printername);
+  }
+
+  panic!("Unsupported OS");
+}
+
+#[tauri::command(rename_all = "snake_case")]
 // this will be accessible with `invoke('plugin:printer|print_pdf')`.
 fn print_pdf(
     id: String,
@@ -88,6 +98,7 @@ pub fn init<R: Runtime>() -> TauriPlugin<R> {
   Builder::new("printer")
     .invoke_handler(tauri::generate_handler![
       get_printers, 
+      get_printers_by_name,
       print_pdf,
       get_jobs,
       restart_job,

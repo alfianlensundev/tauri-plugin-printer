@@ -141,9 +141,45 @@ exports.print_file = print_file;
  * Get all jobs.
  * @returns A array of all printer jobs.
  */
-const jobs = async (printername = null) => {
-    const listPrinter = await (0, exports.printers)();
+const jobs = async (printerid = null) => {
     const allJobs = [];
+    if (printerid != null) {
+        const printer = await (0, exports.printers)(printerid);
+        if (printer.length == 0)
+            return [];
+        const result = await (0, tauri_1.invoke)('plugin:printer|get_jobs', { printername: printer[0].name });
+        const listRawJobs = parseIfJSON(result);
+        for (const job of listRawJobs) {
+            const id = encodeBase64(`${printer[0].name}_@_${job.Id}`);
+            allJobs.push({
+                id,
+                job_id: job.Id,
+                job_status: constants_1.jobStatus[job.JobStatus] != undefined ? {
+                    code: job.JobStatus,
+                    description: constants_1.jobStatus[job.JobStatus].description,
+                    name: constants_1.jobStatus[job.JobStatus].name
+                } : {
+                    code: job.JobStatus,
+                    description: "Unknown Job Status",
+                    name: "Unknown"
+                },
+                computer_name: job.ComputerName,
+                data_type: job.Datatype,
+                document_name: job.DocumentName,
+                job_time: job.JobTime,
+                pages_printed: job.PagesPrinted,
+                position: job.Position,
+                printer_name: job.PrinterName,
+                priority: job.Priority,
+                size: job.Size,
+                submitted_time: job.SubmittedTime ? +job.SubmittedTime?.replace('/Date(', '')?.replace(')/', '') : null,
+                total_pages: job.TotalPages,
+                username: job.UserName
+            });
+        }
+        return allJobs;
+    }
+    const listPrinter = await (0, exports.printers)();
     for (const printer of listPrinter) {
         const result = await (0, tauri_1.invoke)('plugin:printer|get_jobs', { printername: printer.name });
         const listRawJobs = parseIfJSON(result);

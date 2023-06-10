@@ -77,16 +77,28 @@ await jobs(idprinter)
 // get job by id
 await job(id)
 
-// get restart job by id
+// restart all job
+await restart_job()
+
+// restart job by id
 await restart_job(id)
 
-// get pause job by id
+// pause all job
+await pause_job()
+
+// pause job by id
 await pause_job(id)
 
-// get resume job by id
+// resume all job 
+await resume_job()
+
+// resume job by id
 await resume_job(id)
 
-// get resume job by id
+// remove all job
+await remove_job()
+
+// resume job by id
 await remove_job(id)
 
 ```

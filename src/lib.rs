@@ -110,6 +110,7 @@ pub fn init<R: Runtime>() -> TauriPlugin<R> {
       get_printers_by_name,
       print_pdf,
       get_jobs,
+      resume_job,
       restart_job,
       pause_job,
       remove_job

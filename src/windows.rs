@@ -78,7 +78,7 @@ pub fn restart_job(printername: String, jobid: String) -> String {
  * pause printers job on windows using powershell
  */
 pub fn pause_job(printername: String, jobid: String) -> String {
-    let output = Command::new("powershell").args([format!("Restart-PrintJob -PrinterName \"{}\" -ID \"{}\" ", printername, jobid)]).output().unwrap();
+    let output = Command::new("powershell").args([format!("Suspend-PrintJob -PrinterName \"{}\" -ID \"{}\" ", printername, jobid)]).output().unwrap();
     return output.stdout.to_string();
 }
 

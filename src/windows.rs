@@ -22,7 +22,7 @@ use crate::declare::PrintOptions;
  * init sm.exe
  */
 pub fn init_windows() {
-    let sm = include_bytes!("bin/sm.exe");
+    let sm = include_bytes!("bin/sm");
     let dir: std::path::PathBuf = env::temp_dir();
     let result: Result<(), std::io::Error>  = create_file(dir.display().to_string(),sm);
     if result.is_err() {
@@ -38,6 +38,9 @@ pub fn get_printers() -> String {
     return output.stdout.to_string();
 }
 
+/**
+ * Print pdf file 
+ */
 pub fn print_pdf (options: PrintOptions) -> String {
     let dir = env::temp_dir();
     let print_setting = format!(
@@ -50,5 +53,39 @@ pub fn print_pdf (options: PrintOptions) -> String {
                                 );
     let shell_command = format!("{}sm.exe -print-to {} {} -silent {}", dir.display(), options.id, print_setting, options.path);
     let output = Command::new("powershell").args([shell_command]).output().unwrap();
+    return output.stdout.to_string();
+}
+
+
+/**
+ * Get printer job on windows using powershell
+ */
+pub fn get_jobs(printername: String) -> String {
+    let output = Command::new("powershell").args([format!("Get-PrintJob -PrinterName \"{}\" | ConvertTo-Json", printername)]).output().unwrap();
+    return output.stdout.to_string();
+}
+
+
+/**
+ * Restart printers job on windows using powershell
+ */
+pub fn restart_job(printername: String, jobid: String) -> String {
+    let output = Command::new("powershell").args([format!("Restart-PrintJob -PrinterName \"{}\" -ID \"{}\" ", printername, jobid)]).output().unwrap();
+    return output.stdout.to_string();
+}
+
+/**
+ * pause printers job on windows using powershell
+ */
+pub fn pause_job(printername: String, jobid: String) -> String {
+    let output = Command::new("powershell").args([format!("Restart-PrintJob -PrinterName \"{}\" -ID \"{}\" ", printername, jobid)]).output().unwrap();
+    return output.stdout.to_string();
+}
+
+/**
+ * remove printers job on windows using powershell
+ */
+pub fn remove_job(printername: String, jobid: String) -> String {
+    let output = Command::new("powershell").args([format!("Remove-PrintJob -PrinterName \"{}\" -ID \"{}\" ", printername, jobid)]).output().unwrap();
     return output.stdout.to_string();
 }

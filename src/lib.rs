@@ -45,12 +45,55 @@ fn print_pdf(
 }
 
 
+#[tauri::command(rename_all = "snake_case")]
+// this will be accessible with `invoke('plugin:printer|get_jobs')`.
+fn get_jobs(printername: String) -> String {
+  if cfg!(windows) {
+    return windows::get_jobs(printername);
+  }
+  panic!("Unsupported OS");
+}
+
+#[tauri::command(rename_all = "snake_case")]
+// this will be accessible with `invoke('plugin:printer|restart_job')`.
+fn restart_job(printername: String, jobid: String) -> String {
+  if cfg!(windows) {
+    return windows::restart_job(printername,jobid);
+  }
+  panic!("Unsupported OS");
+}
+
+#[tauri::command(rename_all = "snake_case")]
+// this will be accessible with `invoke('plugin:printer|pause_job')`.
+fn pause_job(printername: String, jobid: String) -> String {
+  if cfg!(windows) {
+    return windows::pause_job(printername, jobid);
+  }
+  panic!("Unsupported OS");
+}
+
+#[tauri::command(rename_all = "snake_case")]
+// this will be accessible with `invoke('plugin:printer|remove_job')`.
+fn remove_job(printername: String, jobid: String) -> String {
+  if cfg!(windows) {
+    return windows::remove_job(printername, jobid);
+  }
+  panic!("Unsupported OS");
+}
+
 pub fn init<R: Runtime>() -> TauriPlugin<R> {
   if cfg!(windows) {
     windows::init_windows();
-}
+  }
   Builder::new("printer")
-    .invoke_handler(tauri::generate_handler![get_printers, print_pdf])
+    .invoke_handler(tauri::generate_handler![
+      get_printers, 
+      print_pdf,
+      get_jobs,
+      restart_job,
+      pause_job,
+      remove_job
+    ])
     .build()
 }
 

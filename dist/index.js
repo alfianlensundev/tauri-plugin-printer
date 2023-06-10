@@ -151,7 +151,9 @@ const jobs = async (printerid = null) => {
         if (printer.length == 0)
             return [];
         const result = await (0, tauri_1.invoke)('plugin:printer|get_jobs', { printername: printer[0].name });
-        const listRawJobs = parseIfJSON(result, []);
+        let listRawJobs = parseIfJSON(result, []);
+        if (listRawJobs.length == undefined)
+            listRawJobs = [listRawJobs];
         for (const job of listRawJobs) {
             const id = encodeBase64(`${printer[0].name}_@_${job.Id}`);
             allJobs.push({

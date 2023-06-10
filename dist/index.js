@@ -239,6 +239,17 @@ const restart_job = async (jobid = null) => {
             });
             return result;
         }
+        const listPrinter = await (0, exports.printers)();
+        for (const printer of listPrinter) {
+            const result = await (0, tauri_1.invoke)('plugin:printer|get_jobs', { printername: printer.name });
+            const listRawJobs = parseIfJSON(result);
+            for (const job of listRawJobs) {
+                await (0, tauri_1.invoke)('plugin:printer|restart_job', {
+                    printername: printer.name,
+                    jobid: job.Id
+                });
+            }
+        }
         return result;
     }
     catch (err) {

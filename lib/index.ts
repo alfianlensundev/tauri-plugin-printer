@@ -172,9 +172,7 @@ export const jobs = async (printerid: string|null = null): Promise<Jobs[]> => {
         }
         return allJobs;
     }
-    const listPrinter = await printers()
-    
-
+    const listPrinter = await printers()    
     for (const printer of listPrinter){
         const result: any = await invoke('plugin:printer|get_jobs', {printername: printer.name})
         const listRawJobs = parseIfJSON(result)
@@ -235,7 +233,18 @@ export const restart_job = async (jobid: string|null = null): Promise<ResponseRe
             return result;
         }
 
-        
+        const listPrinter = await printers()    
+        for (const printer of listPrinter){
+            const result: any = await invoke('plugin:printer|get_jobs', {printername: printer.name})
+            const listRawJobs = parseIfJSON(result)
+            for (const job of listRawJobs){
+                await invoke('plugin:printer|restart_job', {
+                    printername: printer.name, 
+                    jobid: job.Id
+                })
+            }
+        }
+
         return result
     } catch (err: any) {
         return {

@@ -2,7 +2,6 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.get_jobs = exports.print_file = exports.printers = void 0;
 const tauri_1 = require("@tauri-apps/api/tauri");
-const constants_1 = require("./constants");
 const parseIfJSON = (str) => {
     try {
         return JSON.parse(str);
@@ -127,15 +126,6 @@ const get_jobs = async () => {
             allJobs.push({
                 id,
                 job_id: job.Id,
-                job_status: constants_1.jobStatus[job.JobStatus] != undefined ? {
-                    code: job.JobStatus,
-                    description: constants_1.jobStatus[job.JobStatus].description,
-                    name: constants_1.jobStatus[job.JobStatus].name
-                } : {
-                    code: job.JobStatus,
-                    description: "Unknown Job Status",
-                    name: "Unknown"
-                },
                 computer_name: job.ComputerName,
                 data_type: job.Datatype,
                 document_name: job.DocumentName,

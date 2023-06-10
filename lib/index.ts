@@ -122,15 +122,7 @@ export const get_jobs = async () => {
             allJobs.push({
                 id,
                 job_id: job.Id,
-                job_status: jobStatus[job.JobStatus] != undefined ? {
-                    code: job.JobStatus,
-                    description: jobStatus[job.JobStatus].description,
-                    name: jobStatus[job.JobStatus].name
-                }: {
-                    code: job.JobStatus,
-                    description: "Unknown Job Status",
-                    name: "Unknown"
-                },
+                
                 computer_name: job.ComputerName,
                 data_type: job.Datatype,
                 document_name: job.DocumentName,

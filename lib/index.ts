@@ -86,9 +86,9 @@ export const printers = async (id: string|null = null): Promise<Printer[]> => {
 /**
  * Get list printers.
  * @params first_param: File Path, second_param: Print Setting
- * @returns A array of printer detail.
+ * @returns A process status.
  */
-export const print_file = async (options: PrintOptions): Promise<any> => {
+export const print_file = async (options: PrintOptions): Promise<ResponseResult> => {
     if (options.path == undefined) throw new Error('print_file require path as string')  
     if (options.id == undefined && options.name == undefined) throw new Error('print_file require id | name as string')  
     let id: string | undefined = "";
@@ -124,7 +124,10 @@ export const print_file = async (options: PrintOptions): Promise<any> => {
         printer_setting_repeat: printerSettings?.repeat,
     }
     const print = await invoke('plugin:printer|print_pdf', optionsParams)
-    return print
+    return {
+        success: true,
+        message: "OK"
+    }
 }
 
 
@@ -206,4 +209,38 @@ export const jobs = async (printerid: string|null = null): Promise<Jobs[]> => {
     }
 
     return allJobs
+}
+
+
+/**
+ * Restart jobs.
+ * @param jobid
+ */
+export const restart_job = async (jobid: string|null = null): Promise<ResponseResult> => {
+    try {
+        const result = {
+            success: true,
+            message: "OK"
+        }
+        if (jobid != null){
+            const idextract = decodeBase64(jobid)
+            if (idextract.length != 2) throw new Error('Wrong jobid')
+            const [printername, id] = idextract.split('_@_')
+
+            await invoke('plugin:printer|restart_job', {
+                printername, 
+                jobid: id
+            })
+
+            return result;
+        }
+
+        
+        return result
+    } catch (err: any) {
+        return {
+            success: false,
+            message: err.message ? err.message : "Fail to restart job"
+        }
+    }
 }

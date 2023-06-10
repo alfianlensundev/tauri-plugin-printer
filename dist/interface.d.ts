@@ -47,3 +47,7 @@ interface Jobs {
     total_pages: number;
     username: string;
 }
+interface ResponseResult {
+    message: string | undefined;
+    success: boolean;
+}

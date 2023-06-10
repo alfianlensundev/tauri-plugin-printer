@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.jobs = exports.print_file = exports.printers = void 0;
+exports.restart_job = exports.jobs = exports.print_file = exports.printers = void 0;
 const tauri_1 = require("@tauri-apps/api/tauri");
 const constants_1 = require("./constants");
 const parseIfJSON = (str, dft = []) => {
@@ -89,7 +89,7 @@ exports.printers = printers;
 /**
  * Get list printers.
  * @params first_param: File Path, second_param: Print Setting
- * @returns A array of printer detail.
+ * @returns A process status.
  */
 const print_file = async (options) => {
     if (options.path == undefined)
@@ -134,7 +134,10 @@ const print_file = async (options) => {
         printer_setting_repeat: printerSettings?.repeat,
     };
     const print = await (0, tauri_1.invoke)('plugin:printer|print_pdf', optionsParams);
-    return print;
+    return {
+        success: true,
+        message: "OK"
+    };
 };
 exports.print_file = print_file;
 /**
@@ -215,3 +218,34 @@ const jobs = async (printerid = null) => {
     return allJobs;
 };
 exports.jobs = jobs;
+/**
+ * Restart jobs.
+ * @param jobid
+ */
+const restart_job = async (jobid = null) => {
+    try {
+        const result = {
+            success: true,
+            message: "OK"
+        };
+        if (jobid != null) {
+            const idextract = decodeBase64(jobid);
+            if (idextract.length != 2)
+                throw new Error('Wrong jobid');
+            const [printername, id] = idextract.split('_@_');
+            await (0, tauri_1.invoke)('plugin:printer|restart_job', {
+                printername,
+                jobid: id
+            });
+            return result;
+        }
+        return result;
+    }
+    catch (err) {
+        return {
+            success: false,
+            message: err.message ? err.message : "Fail to restart job"
+        };
+    }
+};
+exports.restart_job = restart_job;

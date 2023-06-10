@@ -1,4 +1,4 @@
-const {get_jobs, jobs} = require('../dist/index')
+const {get_jobs, restart_job} = require('../dist/index')
 // test('Get printer', async () => {
 //     const result = await printers()
 //     expect(result.length).not.toBe(undefined)
@@ -45,8 +45,7 @@ const {get_jobs, jobs} = require('../dist/index')
 //     console.log(result)
 // })
 
-test('get_jobs', async () => {
-    const data = {}
-    // const result = await jobs("XFwxNzIuMzEuNjQuMjIxXEhQIEluayBUYW5rIDMxMCBzZXJpZXM=");
-    console.log(data.length)
+test('restart_jobs', async () => {
+    const result = await restart_job("XFwxNzIuMzEuNjQuMjIxXEhQIEluayBUYW5rIDMxMCBzZXJpZXNfQF80Ng==");
+    // console.log(data.length)
 })

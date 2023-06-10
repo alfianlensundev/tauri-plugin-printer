@@ -35,7 +35,7 @@ const decodeBase64 = (str: string): string => {
  */
 export const printers = async (id: string|null = null): Promise<Printer[]> => {
     if (id != null){
-        const printername = id = decodeBase64(id);
+        const printername = decodeBase64(id);
         const result: string = await invoke('plugin:printer|get_printers_by_name', {
             printername
         })

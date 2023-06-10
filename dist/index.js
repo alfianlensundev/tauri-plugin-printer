@@ -38,7 +38,7 @@ const decodeBase64 = (str) => {
  */
 const printers = async (id = null) => {
     if (id != null) {
-        const printername = id = decodeBase64(id);
+        const printername = decodeBase64(id);
         const result = await (0, tauri_1.invoke)('plugin:printer|get_printers_by_name', {
             printername
         });

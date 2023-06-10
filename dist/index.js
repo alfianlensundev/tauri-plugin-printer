@@ -145,7 +145,7 @@ const get_jobs = async () => {
                 printer_name: job.PrinterName,
                 priority: job.Priority,
                 size: job.Size,
-                submitted_time: +job.SubmittedTime.replace('/Date(', '').replace(')/', ''),
+                submitted_time: job.SubmittedTime ? +job.SubmittedTime?.replace('/Date(', '')?.replace(')/', '') : null,
                 total_pages: job.TotalPages,
                 username: job.UserName
             });

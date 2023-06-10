@@ -45,7 +45,7 @@ interface Jobs {
     printer_name: string,
     priority: number,
     size: number,
-    submitted_time: number,
+    submitted_time: number | null,
     total_pages: number,
     username: string
 }

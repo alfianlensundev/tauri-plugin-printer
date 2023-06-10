@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.pause_job = exports.resume_job = exports.restart_job = exports.jobs = exports.print_file = exports.printers = void 0;
+exports.remove_job = exports.pause_job = exports.resume_job = exports.restart_job = exports.jobs = exports.print_file = exports.printers = void 0;
 const tauri_1 = require("@tauri-apps/api/tauri");
 const constants_1 = require("./constants");
 const parseIfJSON = (str, dft = []) => {
@@ -344,3 +344,45 @@ const pause_job = async (jobid = null) => {
     }
 };
 exports.pause_job = pause_job;
+/**
+ * Pause jobs.
+ * @param jobid
+ */
+const remove_job = async (jobid = null) => {
+    try {
+        const result = {
+            success: true,
+            message: "OK"
+        };
+        if (jobid != null) {
+            const idextract = decodeBase64(jobid);
+            const [printername = null, id = null] = idextract.split('_@_');
+            if (printername == null || id == null)
+                throw new Error('Wrong jobid');
+            await (0, tauri_1.invoke)('plugin:printer|remove_job', {
+                printername,
+                jobid: id.toString()
+            });
+            return result;
+        }
+        const listPrinter = await (0, exports.printers)();
+        for (const printer of listPrinter) {
+            const result = await (0, tauri_1.invoke)('plugin:printer|get_jobs', { printername: printer.name });
+            const listRawJobs = parseIfJSON(result);
+            for (const job of listRawJobs) {
+                await (0, tauri_1.invoke)('plugin:printer|remove_job', {
+                    printername: printer.name,
+                    jobid: job.Id.toString()
+                });
+            }
+        }
+        return result;
+    }
+    catch (err) {
+        return {
+            success: false,
+            message: err.message ? err.message : "Fail to pause job"
+        };
+    }
+};
+exports.remove_job = remove_job;

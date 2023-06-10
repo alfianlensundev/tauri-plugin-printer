@@ -30,3 +30,8 @@ export declare const resume_job: (jobid?: string | null) => Promise<ResponseResu
  * @param jobid
  */
 export declare const pause_job: (jobid?: string | null) => Promise<ResponseResult>;
+/**
+ * Pause jobs.
+ * @param jobid
+ */
+export declare const remove_job: (jobid?: string | null) => Promise<ResponseResult>;

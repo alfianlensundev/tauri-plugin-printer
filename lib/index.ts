@@ -342,3 +342,47 @@ export const pause_job = async (jobid: string|null = null): Promise<ResponseResu
         }
     }
 }
+
+/**
+ * Pause jobs.
+ * @param jobid
+ */
+export const remove_job = async (jobid: string|null = null): Promise<ResponseResult> => {
+    try {
+        const result = {
+            success: true,
+            message: "OK"
+        }
+        if (jobid != null){
+            const idextract = decodeBase64(jobid)
+            const [printername = null, id = null] = idextract.split('_@_')
+            if (printername == null || id == null) throw new Error('Wrong jobid')
+
+            await invoke('plugin:printer|remove_job', {
+                printername, 
+                jobid: id.toString()
+            })
+
+            return result;
+        }
+
+        const listPrinter = await printers()    
+        for (const printer of listPrinter){
+            const result: any = await invoke('plugin:printer|get_jobs', {printername: printer.name})
+            const listRawJobs = parseIfJSON(result)
+            for (const job of listRawJobs){
+                await invoke('plugin:printer|remove_job', {
+                    printername: printer.name, 
+                    jobid: job.Id.toString()
+                })
+            }
+        }
+
+        return result
+    } catch (err: any) {
+        return {
+            success: false,
+            message: err.message ? err.message : "Fail to pause job"
+        }
+    }
+}

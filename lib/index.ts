@@ -222,12 +222,13 @@ export const restart_job = async (jobid: string|null = null): Promise<ResponseRe
         }
         if (jobid != null){
             const idextract = decodeBase64(jobid)
+            
             const [printername = null, id = null] = idextract.split('_@_')
             if (printername == null || id == null) throw new Error('Wrong jobid')
 
             await invoke('plugin:printer|restart_job', {
                 printername, 
-                jobid: id
+                jobid: id.toString()
             })
 
             return result;
@@ -240,7 +241,7 @@ export const restart_job = async (jobid: string|null = null): Promise<ResponseRe
             for (const job of listRawJobs){
                 await invoke('plugin:printer|restart_job', {
                     printername: printer.name, 
-                    jobid: job.Id
+                    jobid: job.Id.toString()
                 })
             }
         }
@@ -271,7 +272,7 @@ export const resume_job = async (jobid: string|null = null): Promise<ResponseRes
 
             await invoke('plugin:printer|resume_job', {
                 printername, 
-                jobid: id
+                jobid: id.toString()
             })
 
             return result;
@@ -284,7 +285,7 @@ export const resume_job = async (jobid: string|null = null): Promise<ResponseRes
             for (const job of listRawJobs){
                 await invoke('plugin:printer|resume_job', {
                     printername: printer.name, 
-                    jobid: job.Id
+                    jobid: job.Id.toString()
                 })
             }
         }
@@ -315,7 +316,7 @@ export const pause_job = async (jobid: string|null = null): Promise<ResponseResu
 
             await invoke('plugin:printer|pause_job', {
                 printername, 
-                jobid: id
+                jobid: id.toString()
             })
 
             return result;
@@ -328,7 +329,7 @@ export const pause_job = async (jobid: string|null = null): Promise<ResponseResu
             for (const job of listRawJobs){
                 await invoke('plugin:printer|pause_job', {
                     printername: printer.name, 
-                    jobid: job.Id
+                    jobid: job.Id.toString()
                 })
             }
         }

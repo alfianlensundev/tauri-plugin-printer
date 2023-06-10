@@ -235,7 +235,7 @@ const restart_job = async (jobid = null) => {
                 throw new Error('Wrong jobid');
             await (0, tauri_1.invoke)('plugin:printer|restart_job', {
                 printername,
-                jobid: id
+                jobid: id.toString()
             });
             return result;
         }
@@ -246,7 +246,7 @@ const restart_job = async (jobid = null) => {
             for (const job of listRawJobs) {
                 await (0, tauri_1.invoke)('plugin:printer|restart_job', {
                     printername: printer.name,
-                    jobid: job.Id
+                    jobid: job.Id.toString()
                 });
             }
         }
@@ -277,7 +277,7 @@ const resume_job = async (jobid = null) => {
                 throw new Error('Wrong jobid');
             await (0, tauri_1.invoke)('plugin:printer|resume_job', {
                 printername,
-                jobid: id
+                jobid: id.toString()
             });
             return result;
         }
@@ -288,7 +288,7 @@ const resume_job = async (jobid = null) => {
             for (const job of listRawJobs) {
                 await (0, tauri_1.invoke)('plugin:printer|resume_job', {
                     printername: printer.name,
-                    jobid: job.Id
+                    jobid: job.Id.toString()
                 });
             }
         }
@@ -319,7 +319,7 @@ const pause_job = async (jobid = null) => {
                 throw new Error('Wrong jobid');
             await (0, tauri_1.invoke)('plugin:printer|pause_job', {
                 printername,
-                jobid: id
+                jobid: id.toString()
             });
             return result;
         }
@@ -330,7 +330,7 @@ const pause_job = async (jobid = null) => {
             for (const job of listRawJobs) {
                 await (0, tauri_1.invoke)('plugin:printer|pause_job', {
                     printername: printer.name,
-                    jobid: job.Id
+                    jobid: job.Id.toString()
                 });
             }
         }

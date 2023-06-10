@@ -218,7 +218,7 @@ export const job = async (jobid: string): Promise<Jobs|null> => {
     const idextract = decodeBase64(jobid)
     const [printername = null, id = null] = idextract.split('_@_')
     if (printername == null || id == null) null
-    const result: any = await invoke('plugin:printer|get_jobs_by_id', {printername: printername, })
+    const result: any = await invoke('plugin:printer|get_jobs_by_id', {printername: printername, jobid: id})
     const job = parseIfJSON(result, null)
     return {
         id: jobid,

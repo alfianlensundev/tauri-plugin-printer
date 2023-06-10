@@ -229,7 +229,7 @@ const job = async (jobid) => {
     const [printername = null, id = null] = idextract.split('_@_');
     if (printername == null || id == null)
         null;
-    const result = await (0, tauri_1.invoke)('plugin:printer|get_jobs_by_id', { printername: printername, });
+    const result = await (0, tauri_1.invoke)('plugin:printer|get_jobs_by_id', { printername: printername, jobid: id });
     const job = parseIfJSON(result, null);
     return {
         id: jobid,

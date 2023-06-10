@@ -117,7 +117,7 @@ exports.print_file = print_file;
  * @returns A array of all printer jobs.
  */
 const jobs = async () => {
-    const listPrinter = await (0, exports.printers)();
+    const listPrinter = [{ "id": "XFwxNzIuMzEuNjQuMjIxXEhQIEluayBUYW5rIDMxMCBzZXJpZXM=", "name": "\\\\172.31.64.221\\HP Ink Tank 310 series", "driver_name": "HP Ink Tank 310 series", "job_count": 4, "print_processor": "winprint", "port_name": "USB001", "share_name": "HP Ink Tank 310 series", "computer_name": "172.31.64.221", "printer_status": 18, "shared": true, "type": 1, "priority": 1 }];
     const allJobs = [];
     for (const printer of listPrinter) {
         const listRawJobs = await (0, tauri_1.invoke)('plugin:printer|get_jobs', { printername: printer.name });

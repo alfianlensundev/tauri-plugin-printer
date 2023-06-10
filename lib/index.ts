@@ -112,7 +112,7 @@ export const print_file = async (options: PrintOptions): Promise<any> => {
  * @returns A array of all printer jobs.
  */
 export const jobs = async () => {
-    const listPrinter = await printers()
+    const listPrinter = [{"id":"XFwxNzIuMzEuNjQuMjIxXEhQIEluayBUYW5rIDMxMCBzZXJpZXM=","name":"\\\\172.31.64.221\\HP Ink Tank 310 series","driver_name":"HP Ink Tank 310 series","job_count":4,"print_processor":"winprint","port_name":"USB001","share_name":"HP Ink Tank 310 series","computer_name":"172.31.64.221","printer_status":18,"shared":true,"type":1,"priority":1}]
     const allJobs: Jobs[] = []
 
     for (const printer of listPrinter){

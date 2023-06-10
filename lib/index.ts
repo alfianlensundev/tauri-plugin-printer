@@ -176,7 +176,8 @@ export const jobs = async (printerid: string|null = null): Promise<Jobs[]> => {
     const listPrinter = await printers()    
     for (const printer of listPrinter){
         const result: any = await invoke('plugin:printer|get_jobs', {printername: printer.name})
-        const listRawJobs = parseIfJSON(result)
+        let listRawJobs: any = parseIfJSON(result, [])
+        if (listRawJobs.length == undefined) listRawJobs = [listRawJobs]
         for (const job of listRawJobs){
             const id = encodeBase64(`${printer.name}_@_${job.Id}`);
             allJobs.push({

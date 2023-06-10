@@ -27,8 +27,13 @@ interface PrintOptions {
     print_setting?: PrintSettings;
 }
 
+interface JobsStatus {
+    code: number;
+    name: string;
+    description: string;
+}
 interface Jobs {
-    job_status: number,
+    job_status: JobsStatus,
     computer_name: string,
     data_type: string,
     document_name: string,

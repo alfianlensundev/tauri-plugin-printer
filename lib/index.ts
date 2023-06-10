@@ -112,17 +112,26 @@ export const print_file = async (options: PrintOptions): Promise<any> => {
  * @returns A array of all printer jobs.
  */
 export const jobs = async () => {
-    const listPrinter = [{"id":"XFwxNzIuMzEuNjQuMjIxXEhQIEluayBUYW5rIDMxMCBzZXJpZXM=","name":"\\\\172.31.64.221\\HP Ink Tank 310 series","driver_name":"HP Ink Tank 310 series","job_count":4,"print_processor":"winprint","port_name":"USB001","share_name":"HP Ink Tank 310 series","computer_name":"172.31.64.221","printer_status":18,"shared":true,"type":1,"priority":1}]
+    const listPrinter = await printers()
     const allJobs: Jobs[] = []
 
     for (const printer of listPrinter){
-        const listRawJobs: any = await invoke('plugin:printer|get_jobs', {printername: printer.name})
+        const result: any = await invoke('plugin:printer|get_jobs', {printername: printer.name})
+        const listRawJobs = parseIfJSON(result)
         for (const job of listRawJobs){
             const id = encodeBase64(`${printer.name}_@_${job.Id}`);
             allJobs.push({
                 id,
                 job_id: job.Id,
-                
+                job_status: jobStatus[job.JobStatus] != undefined ? {
+                    code: job.JobStatus,
+                    description: jobStatus[job.JobStatus].description,
+                    name: jobStatus[job.JobStatus].name
+                }: {
+                    code: job.JobStatus,
+                    description: "Unknown Job Status",
+                    name: "Unknown"
+                },
                 computer_name: job.ComputerName,
                 data_type: job.Datatype,
                 document_name: job.DocumentName,

@@ -33,7 +33,7 @@ interface JobsStatus {
     description: string;
 }
 interface Jobs {
-    // job_status: JobsStatus,
+    job_status: JobsStatus,
     computer_name: string,
     data_type: string,
     document_name: string,

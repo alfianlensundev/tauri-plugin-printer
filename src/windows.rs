@@ -73,6 +73,14 @@ pub fn get_jobs(printername: String) -> String {
     return output.stdout.to_string();
 }
 
+/**
+ * Get printer job by id on windows using powershell
+ */
+pub fn get_jobs_by_id(printername: String, jobid: String) -> String {
+    let output = Command::new("powershell").args([format!("Get-PrintJob -PrinterName \"{}\" -ID \"{}\" | ConvertTo-Json", printername, jobid)]).output().unwrap();
+    return output.stdout.to_string();
+}
+
 
 /**
  * Resume printers job on windows using powershell

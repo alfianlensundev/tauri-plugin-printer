@@ -16,6 +16,11 @@ export declare const print_file: (options: PrintOptions) => Promise<ResponseResu
  */
 export declare const jobs: (printerid?: string | null) => Promise<Jobs[]>;
 /**
+ * Get job by id.
+ * @returns Printer job.
+ */
+export declare const job: (jobid: string) => Promise<Jobs | null>;
+/**
  * Restart jobs.
  * @param jobid
  */
@@ -31,7 +36,7 @@ export declare const resume_job: (jobid?: string | null) => Promise<ResponseResu
  */
 export declare const pause_job: (jobid?: string | null) => Promise<ResponseResult>;
 /**
- * Pause jobs.
+ * Remove jobs.
  * @param jobid
  */
 export declare const remove_job: (jobid?: string | null) => Promise<ResponseResult>;

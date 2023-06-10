@@ -141,7 +141,8 @@ export const jobs = async (printerid: string|null = null): Promise<Jobs[]> => {
         const printer = await printers(printerid)    
         if (printer.length == 0) return []
         const result: any = await invoke('plugin:printer|get_jobs', {printername: printer[0].name})
-        const listRawJobs = parseIfJSON(result)
+        let listRawJobs: any = parseIfJSON(result, [])
+        if (listRawJobs.length == undefined) listRawJobs = [listRawJobs]
         for (const job of listRawJobs){
             const id = encodeBase64(`${printer[0].name}_@_${job.Id}`);
             allJobs.push({
@@ -209,6 +210,43 @@ export const jobs = async (printerid: string|null = null): Promise<Jobs[]> => {
     return allJobs
 }
 
+/**
+ * Get job by id.
+ * @returns Printer job.
+ */
+export const job = async (jobid: string): Promise<Jobs|null> => {
+    const idextract = decodeBase64(jobid)
+    const [printername = null, id = null] = idextract.split('_@_')
+    if (printername == null || id == null) null
+    const result: any = await invoke('plugin:printer|get_jobs_by_id', {printername: printername, })
+    const job = parseIfJSON(result, null)
+    return {
+        id: jobid,
+        job_id: job.Id,
+        job_status: jobStatus[job.JobStatus] != undefined ? {
+            code: job.JobStatus,
+            description: jobStatus[job.JobStatus].description,
+            name: jobStatus[job.JobStatus].name
+        }: {
+            code: job.JobStatus,
+            description: "Unknown Job Status",
+            name: "Unknown"
+        },
+        computer_name: job.ComputerName,
+        data_type: job.Datatype,
+        document_name: job.DocumentName,
+        job_time: job.JobTime,
+        pages_printed: job.PagesPrinted,
+        position: job.Position,
+        printer_name: job.PrinterName,
+        priority: job.Priority,
+        size: job.Size,
+        submitted_time: job.SubmittedTime ? +job.SubmittedTime?.replace('/Date(', '')?.replace(')/','') : null,
+        total_pages: job.TotalPages,
+        username: job.UserName
+    }
+}
+
 
 /**
  * Restart jobs.
@@ -237,7 +275,7 @@ export const restart_job = async (jobid: string|null = null): Promise<ResponseRe
         const listPrinter = await printers()    
         for (const printer of listPrinter){
             const result: any = await invoke('plugin:printer|get_jobs', {printername: printer.name})
-            const listRawJobs = parseIfJSON(result)
+            const listRawJobs = parseIfJSON(result, [])
             for (const job of listRawJobs){
                 await invoke('plugin:printer|restart_job', {
                     printername: printer.name, 
@@ -344,7 +382,7 @@ export const pause_job = async (jobid: string|null = null): Promise<ResponseResu
 }
 
 /**
- * Pause jobs.
+ * Remove jobs.
  * @param jobid
  */
 export const remove_job = async (jobid: string|null = null): Promise<ResponseResult> => {

@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.remove_job = exports.pause_job = exports.resume_job = exports.restart_job = exports.jobs = exports.print_file = exports.printers = void 0;
+exports.remove_job = exports.pause_job = exports.resume_job = exports.restart_job = exports.job = exports.jobs = exports.print_file = exports.printers = void 0;
 const tauri_1 = require("@tauri-apps/api/tauri");
 const constants_1 = require("./constants");
 const parseIfJSON = (str, dft = []) => {
@@ -151,7 +151,7 @@ const jobs = async (printerid = null) => {
         if (printer.length == 0)
             return [];
         const result = await (0, tauri_1.invoke)('plugin:printer|get_jobs', { printername: printer[0].name });
-        const listRawJobs = parseIfJSON(result);
+        const listRawJobs = parseIfJSON(result, []);
         for (const job of listRawJobs) {
             const id = encodeBase64(`${printer[0].name}_@_${job.Id}`);
             allJobs.push({
@@ -219,6 +219,44 @@ const jobs = async (printerid = null) => {
 };
 exports.jobs = jobs;
 /**
+ * Get job by id.
+ * @returns Printer job.
+ */
+const job = async (jobid) => {
+    const idextract = decodeBase64(jobid);
+    const [printername = null, id = null] = idextract.split('_@_');
+    if (printername == null || id == null)
+        null;
+    const result = await (0, tauri_1.invoke)('plugin:printer|get_jobs_by_id', { printername: printername, });
+    const job = parseIfJSON(result, null);
+    return {
+        id: jobid,
+        job_id: job.Id,
+        job_status: constants_1.jobStatus[job.JobStatus] != undefined ? {
+            code: job.JobStatus,
+            description: constants_1.jobStatus[job.JobStatus].description,
+            name: constants_1.jobStatus[job.JobStatus].name
+        } : {
+            code: job.JobStatus,
+            description: "Unknown Job Status",
+            name: "Unknown"
+        },
+        computer_name: job.ComputerName,
+        data_type: job.Datatype,
+        document_name: job.DocumentName,
+        job_time: job.JobTime,
+        pages_printed: job.PagesPrinted,
+        position: job.Position,
+        printer_name: job.PrinterName,
+        priority: job.Priority,
+        size: job.Size,
+        submitted_time: job.SubmittedTime ? +job.SubmittedTime?.replace('/Date(', '')?.replace(')/', '') : null,
+        total_pages: job.TotalPages,
+        username: job.UserName
+    };
+};
+exports.job = job;
+/**
  * Restart jobs.
  * @param jobid
  */
@@ -242,7 +280,7 @@ const restart_job = async (jobid = null) => {
         const listPrinter = await (0, exports.printers)();
         for (const printer of listPrinter) {
             const result = await (0, tauri_1.invoke)('plugin:printer|get_jobs', { printername: printer.name });
-            const listRawJobs = parseIfJSON(result);
+            const listRawJobs = parseIfJSON(result, []);
             for (const job of listRawJobs) {
                 await (0, tauri_1.invoke)('plugin:printer|restart_job', {
                     printername: printer.name,
@@ -345,7 +383,7 @@ const pause_job = async (jobid = null) => {
 };
 exports.pause_job = pause_job;
 /**
- * Pause jobs.
+ * Remove jobs.
  * @param jobid
  */
 const remove_job = async (jobid = null) => {

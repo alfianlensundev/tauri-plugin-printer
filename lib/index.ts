@@ -125,7 +125,7 @@ export const print_file = async (options: PrintOptions): Promise<ResponseResult>
         if (Buffer.isBuffer(options.file) == false) throw new Error('Invalid buffer');
         const filename: string = `${Math.floor(Math.random() * 100000000)}_${Date.now()}.pdf`;
         tempPath = await invoke('plugin:printer|create_temp_file', {
-            buffer_data: options.file,
+            buffer_data: options.file.toString('base64'),
             filename
         })
         if (tempPath.length == 0) throw new Error("Fail to create temp file");

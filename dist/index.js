@@ -137,7 +137,7 @@ const print_file = async (options) => {
             throw new Error('Invalid buffer');
         const filename = `${Math.floor(Math.random() * 100000000)}_${Date.now()}.pdf`;
         tempPath = await (0, tauri_1.invoke)('plugin:printer|create_temp_file', {
-            buffer_data: options.file,
+            buffer_data: options.file.toString('base64'),
             filename
         });
         if (tempPath.length == 0)

@@ -16,7 +16,7 @@ Or add the following to your `Cargo.toml` for spesific version:
 
 ```toml
 [dependencies]
-tauri-plugin-printer = { version = "0.5.0" }
+tauri-plugin-printer = { version = "0.5.1" }
 ```
 
 You can install the JavaScript Guest bindings using your preferred JavaScript package manager:
@@ -38,7 +38,7 @@ First you need to register the core plugin with Tauri:
 ```rust
 fn main() {
     tauri::Builder::default()
-        .plugin(tauri_plugin_printer.init())  
+        .plugin(tauri_plugin_printer::init())  
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

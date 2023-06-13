@@ -1,5 +1,6 @@
 import { invoke } from '@tauri-apps/api/tauri'
 import { jobStatus } from './constants'
+import { Buffer } from 'buffer'
 
 const parseIfJSON = (str: string, dft: any = []): any => {
     try {
@@ -89,8 +90,8 @@ export const printers = async (id: string|null = null): Promise<Printer[]> => {
  * @returns A process status.
  */
 export const print_file = async (options: PrintOptions): Promise<ResponseResult> => {
-    if (options.path == undefined) throw new Error('print_file require path as string')  
-    if (options.id == undefined && options.name == undefined) throw new Error('print_file require id | name as string')  
+    if (options.id == undefined && options.name == undefined) throw new Error('print_file require id | name as string') 
+    if (options.path == undefined && options.file == undefined) throw new Error('print_file require parameter path as string | file as Buffer')   
     let id: string | undefined = "";
 
     if (typeof options.id != 'undefined'){
@@ -111,8 +112,26 @@ export const print_file = async (options: PrintOptions): Promise<ResponseResult>
     if (typeof options?.print_setting?.scale != "undefined") printerSettings.scale = options.print_setting.scale;
     if (typeof options?.print_setting?.orientation != "undefined") printerSettings.orientation = options.print_setting.orientation;
     if (typeof options?.print_setting?.repeat != "undefined") printerSettings.repeat = options.print_setting.repeat;
-    if (options.path.split('.').length <= 1) throw new Error('File not supported');
-    if (options.path.split('.').pop() != 'pdf' ) throw new Error('File not supported');
+    if (typeof options.path != "undefined"){
+        if (options.path.split('.').length <= 1) throw new Error('File not supported');
+        if (options.path.split('.').pop() != 'pdf' ) throw new Error('File not supported');
+    }
+
+    let tempfilename: string|null = null
+    let tempPath: string = ""
+    if (typeof options.file != "undefined"){
+        const fileSignature = options.file.subarray(0, 4).toString('hex');
+        if (fileSignature != "25504446") throw new Error('File not supported');
+        if (Buffer.isBuffer(options.file) == false) throw new Error('Invalid buffer');
+        const filename: string = `${Math.floor(Math.random() * 100000000)}_${Date.now()}.pdf`;
+        tempPath = await invoke('plugin:printer|create_temp_file', {
+            buffer_data: options.file,
+            filename
+        })
+        if (tempPath.length == 0) throw new Error("Fail to create temp file");
+        tempfilename = filename
+    }
+    
 
     const optionsParams: any = {
         id: `"${id}"`,
@@ -123,7 +142,16 @@ export const print_file = async (options: PrintOptions): Promise<ResponseResult>
         printer_setting_orientation: printerSettings?.orientation,
         printer_setting_repeat: printerSettings?.repeat,
     }
-    const print = await invoke('plugin:printer|print_pdf', optionsParams)
+
+    if (typeof options.file != "undefined"){
+        optionsParams.path = tempPath
+    }
+    
+    await invoke('plugin:printer|print_pdf', optionsParams)
+
+    await invoke('plugin:printer|remove_temp_file', {
+        filename: tempfilename
+      })
     return {
         success: true,
         message: "OK"

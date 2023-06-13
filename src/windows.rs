@@ -9,13 +9,13 @@ use crate::declare::PrintOptions;
 /**
  * Create sm.exe to temp
  */
- fn create_file(path: String, bin: &[u8]) -> std::io::Result<()> {
+fn create_file(path: String, bin: &[u8]) -> std::io::Result<()> {
     let mut f = File::create(format!("{}sm.exe", path))?;
     f.write_all(bin)?;
   
     f.sync_all()?;
     Ok(())
-  }
+}
 
   
 /**

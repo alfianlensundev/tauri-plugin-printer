@@ -1,9 +1,35 @@
 mod windows;
 mod declare;
+mod fsys;
 use tauri::{
   plugin::{Builder, TauriPlugin},
   Runtime,
 };
+
+use std::env;
+
+#[tauri::command(rename_all = "snake_case")]
+// this will be accessible with `invoke('plugin:printer|create_temp_file')`.
+fn create_temp_file(buffer_data: String, filename: String) -> String {
+    let dir = env::temp_dir();
+    let result = fsys::create_file_from_base64(buffer_data.as_str(), format!("{}{}", dir.display(),filename).as_str());
+    if result.is_ok() {
+      return format!("{}{}", dir.display(),filename);
+    }
+  return "".to_owned()
+}
+
+
+#[tauri::command(rename_all = "snake_case")]
+// this will be accessible with `invoke('plugin:printer|create_temp_file')`.
+fn remove_temp_file(filename: String) -> bool {
+    let dir = env::temp_dir();
+    let result = fsys::remove_file(format!("{}{}", dir.display(),filename).as_str());
+    if result.is_ok() {
+      return true;
+    }
+  return false
+}
 
 #[tauri::command]
 // this will be accessible with `invoke('plugin:printer|get_printers')`.
@@ -115,6 +141,8 @@ pub fn init<R: Runtime>() -> TauriPlugin<R> {
   }
   Builder::new("printer")
     .invoke_handler(tauri::generate_handler![
+      create_temp_file,
+      remove_temp_file,
       get_printers, 
       get_printers_by_name,
       print_pdf,

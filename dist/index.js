@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.remove_job = exports.pause_job = exports.resume_job = exports.restart_job = exports.job = exports.jobs = exports.print_file = exports.printers = void 0;
 const tauri_1 = require("@tauri-apps/api/tauri");
 const constants_1 = require("./constants");
+const buffer_1 = require("buffer");
 const parseIfJSON = (str, dft = []) => {
     try {
         return JSON.parse(str);
@@ -14,7 +15,7 @@ const parseIfJSON = (str, dft = []) => {
 const encodeBase64 = (str) => {
     if (typeof window === "undefined") {
         // in nodejs
-        return Buffer.from(str, 'utf-8').toString('base64');
+        return buffer_1.Buffer.from(str, 'utf-8').toString('base64');
     }
     else {
         // in browser
@@ -24,7 +25,7 @@ const encodeBase64 = (str) => {
 const decodeBase64 = (str) => {
     if (typeof window === "undefined") {
         // in nodejs
-        return Buffer.from(str, 'base64').toString('utf-8');
+        return buffer_1.Buffer.from(str, 'base64').toString('utf-8');
     }
     else {
         // in browser
@@ -92,10 +93,10 @@ exports.printers = printers;
  * @returns A process status.
  */
 const print_file = async (options) => {
-    if (options.path == undefined)
-        throw new Error('print_file require path as string');
     if (options.id == undefined && options.name == undefined)
         throw new Error('print_file require id | name as string');
+    if (options.path == undefined && options.file == undefined)
+        throw new Error('print_file require parameter path as string | file as Buffer');
     let id = "";
     if (typeof options.id != 'undefined') {
         id = decodeBase64(options.id);
@@ -120,10 +121,29 @@ const print_file = async (options) => {
         printerSettings.orientation = options.print_setting.orientation;
     if (typeof options?.print_setting?.repeat != "undefined")
         printerSettings.repeat = options.print_setting.repeat;
-    if (options.path.split('.').length <= 1)
-        throw new Error('File not supported');
-    if (options.path.split('.').pop() != 'pdf')
-        throw new Error('File not supported');
+    if (typeof options.path != "undefined") {
+        if (options.path.split('.').length <= 1)
+            throw new Error('File not supported');
+        if (options.path.split('.').pop() != 'pdf')
+            throw new Error('File not supported');
+    }
+    let tempfilename = null;
+    let tempPath = "";
+    if (typeof options.file != "undefined") {
+        const fileSignature = options.file.subarray(0, 4).toString('hex');
+        if (fileSignature != "25504446")
+            throw new Error('File not supported');
+        if (buffer_1.Buffer.isBuffer(options.file) == false)
+            throw new Error('Invalid buffer');
+        const filename = `${Math.floor(Math.random() * 100000000)}_${Date.now()}.pdf`;
+        tempPath = await (0, tauri_1.invoke)('plugin:printer|create_temp_file', {
+            buffer_data: options.file,
+            filename
+        });
+        if (tempPath.length == 0)
+            throw new Error("Fail to create temp file");
+        tempfilename = filename;
+    }
     const optionsParams = {
         id: `"${id}"`,
         path: options.path,
@@ -133,7 +153,13 @@ const print_file = async (options) => {
         printer_setting_orientation: printerSettings?.orientation,
         printer_setting_repeat: printerSettings?.repeat,
     };
-    const print = await (0, tauri_1.invoke)('plugin:printer|print_pdf', optionsParams);
+    if (typeof options.file != "undefined") {
+        optionsParams.path = tempPath;
+    }
+    await (0, tauri_1.invoke)('plugin:printer|print_pdf', optionsParams);
+    await (0, tauri_1.invoke)('plugin:printer|remove_temp_file', {
+        filename: tempfilename
+    });
     return {
         success: true,
         message: "OK"

@@ -16,7 +16,7 @@ Or add the following to your `Cargo.toml` for spesific version:
 
 ```toml
 [dependencies]
-tauri-plugin-printer = { version = "0.4.1" }
+tauri-plugin-printer = { version = "0.5.0" }
 ```
 
 You can install the JavaScript Guest bindings using your preferred JavaScript package manager:
@@ -58,7 +58,8 @@ const list = await printers(id)
 // print pdf file
 await print_file({
     id: "idfromlistprinter",
-    path: 'F:/path/to/file.pdf',
+    path: 'F:/path/to/file.pdf', 
+    file: BufferData,
     print_setting: {
         orientation: "landscape",
         method: "simplex", // duplex | simplex | duplexshort

@@ -1,3 +1,4 @@
+/// <reference types="node" />
 interface Printer {
     id: string;
     name: string;
@@ -22,7 +23,8 @@ interface PrintSettings {
 interface PrintOptions {
     id?: string;
     name?: string;
-    path: string;
+    path?: string;
+    file?: Buffer;
     print_setting?: PrintSettings;
 }
 interface JobsStatus {

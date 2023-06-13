@@ -8,6 +8,18 @@ All notable changes to this project will be documented in this file. See [standa
 - method `add_printer` (*Used for printer*)
 - method `remove_printer` (*Used for remove printer*)
 
+## v0.5.0
+[Compare changes](https://github.com/alfianlensundev/tauri-plugin-printer/compare/v0.4.1...v0.5.0)
+
+### Added
+- Support print buffer file -> print_file({file: Buffer})
+
+## v0.4.1
+[Compare changes](https://github.com/alfianlensundev/tauri-plugin-printer/compare/v0.4.0...v0.4.1)
+
+### Fixed
+- fix cant get jobs when job only one 
+
 ## v0.4.0
 [Compare changes](https://github.com/alfianlensundev/tauri-plugin-printer/compare/v0.3.0...v0.4.0)
 

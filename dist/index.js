@@ -157,9 +157,9 @@ const print_file = async (options) => {
         optionsParams.path = tempPath;
     }
     await (0, tauri_1.invoke)('plugin:printer|print_pdf', optionsParams);
-    await (0, tauri_1.invoke)('plugin:printer|remove_temp_file', {
-        filename: tempfilename
-    });
+    // await invoke('plugin:printer|remove_temp_file', {
+    //     filename: tempfilename
+    //   })
     return {
         success: true,
         message: "OK"

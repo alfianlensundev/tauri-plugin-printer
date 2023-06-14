@@ -140,6 +140,7 @@ const print_file = async (options) => {
             buffer_data: options.file.toString('base64'),
             filename
         });
+        console.log(tempPath);
         if (tempPath.length == 0)
             throw new Error("Fail to create temp file");
         tempfilename = filename;

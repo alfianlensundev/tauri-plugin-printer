@@ -149,7 +149,8 @@ export const print_file = async (options: PrintOptions): Promise<ResponseResult>
         optionsParams.path = tempPath
     }
     
-    await invoke('plugin:printer|print_pdf', optionsParams)
+    console.log(optionsParams)
+    // await invoke('plugin:printer|print_pdf', optionsParams)
 
     // await invoke('plugin:printer|remove_temp_file', {
     //     filename: tempfilename

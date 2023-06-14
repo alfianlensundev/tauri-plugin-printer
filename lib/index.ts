@@ -149,9 +149,9 @@ export const print_file = async (options: PrintOptions): Promise<ResponseResult>
     
     await invoke('plugin:printer|print_pdf', optionsParams)
 
-    await invoke('plugin:printer|remove_temp_file', {
-        filename: tempfilename
-      })
+    // await invoke('plugin:printer|remove_temp_file', {
+    //     filename: tempfilename
+    //   })
     return {
         success: true,
         message: "OK"

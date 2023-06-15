@@ -129,7 +129,6 @@ export const print_file = async (options: PrintOptions): Promise<ResponseResult>
             filename
         })
 
-        console.log(tempPath)
         if (tempPath.length == 0) throw new Error("Fail to create temp file");
         tempfilename = filename
     }
@@ -151,9 +150,9 @@ export const print_file = async (options: PrintOptions): Promise<ResponseResult>
     
     await invoke('plugin:printer|print_pdf', optionsParams)
 
-    // await invoke('plugin:printer|remove_temp_file', {
-    //     filename: tempfilename
-    //   })
+    await invoke('plugin:printer|remove_temp_file', {
+        filename: tempfilename
+    })
     return {
         success: true,
         message: "OK"

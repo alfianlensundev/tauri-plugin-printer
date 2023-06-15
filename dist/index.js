@@ -140,7 +140,6 @@ const print_file = async (options) => {
             buffer_data: options.file.toString('base64'),
             filename
         });
-        console.log(tempPath);
         if (tempPath.length == 0)
             throw new Error("Fail to create temp file");
         tempfilename = filename;
@@ -158,9 +157,9 @@ const print_file = async (options) => {
         optionsParams.path = tempPath;
     }
     await (0, tauri_1.invoke)('plugin:printer|print_pdf', optionsParams);
-    // await invoke('plugin:printer|remove_temp_file', {
-    //     filename: tempfilename
-    //   })
+    await (0, tauri_1.invoke)('plugin:printer|remove_temp_file', {
+        filename: tempfilename
+    });
     return {
         success: true,
         message: "OK"

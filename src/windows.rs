@@ -52,7 +52,7 @@ pub fn get_printers_by_name(printername: String) -> String {
 pub fn print_pdf (options: PrintOptions) -> String {
     let dir = env::temp_dir();
     let print_setting = format!(
-                                    "-print-settings \"paper={},{},{},{}\" -print-settings \"{}x\"", 
+                                    "-print-settings \"paper={},{},{},{},'{}x'\"", 
                                     options.print_setting.paper,
                                     options.print_setting.method,
                                     options.print_setting.scale,

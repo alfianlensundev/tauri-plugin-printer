@@ -8,6 +8,12 @@ All notable changes to this project will be documented in this file. See [standa
 - method `add_printer` (*Used for printer*)
 - method `remove_printer` (*Used for remove printer*)
 
+## v0.5.2
+[Compare changes](https://github.com/alfianlensundev/tauri-plugin-printer/compare/v0.5.1...v0.5.2)
+
+### Fixed
+- Print with repeat only print blank page
+
 ## v0.5.1
 [Compare changes](https://github.com/alfianlensundev/tauri-plugin-printer/compare/v0.5.0...v0.5.1)
 

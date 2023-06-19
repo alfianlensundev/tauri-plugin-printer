@@ -68,6 +68,7 @@ const printers = async (id = null) => {
     const printers = [];
     if (resultData.is_unix) {
         const listPrinter = resultData.data.split('\n');
+        console.log(listPrinter);
         for (let i = 0; i < listPrinter.length; i++) {
             const printerName = listPrinter[i];
             const id = encodeBase64(printerName);

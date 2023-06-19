@@ -65,9 +65,11 @@ export const printers = async (id: string|null = null): Promise<Printer[]> => {
     const printers: Printer[] = [];
     if (resultData.is_unix){
         const listPrinter = resultData.data.split('\n')
+        console.log(listPrinter)
         for (let i = 0; i<listPrinter.length; i++){
             const printerName: any = listPrinter[i]
             const id = encodeBase64(printerName);
+
             printers.push({
                 id,
                 name: printerName.replace('_', ' '),

@@ -44,6 +44,7 @@ const printers = async (id = null) => {
             printername
         });
         const item = parseIfJSON(result, null);
+        console.log(item);
         if (item == null)
             return [];
         return [

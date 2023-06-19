@@ -41,6 +41,7 @@ export const printers = async (id: string|null = null): Promise<Printer[]> => {
             printername
         })
         const item = parseIfJSON(result, null);
+        console.log(item)
         if (item == null) return [];
         return [
             {

@@ -1,4 +1,5 @@
 mod windows;
+mod unix;
 mod declare;
 mod fsys;
 use tauri::{
@@ -36,6 +37,9 @@ fn remove_temp_file(filename: String) -> bool {
 fn get_printers() -> String {
   if cfg!(windows) {
       return windows::get_printers();
+  }
+  if cfg!(unix) {
+      return unix::get_printers();
   }
 
   panic!("Unsupported OS");

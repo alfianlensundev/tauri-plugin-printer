@@ -60,31 +60,36 @@ export const printers = async (id: string|null = null): Promise<Printer[]> => {
         ]
     }
     const result: string = await invoke('plugin:printer|get_printers')
-    console.log(result, 'result')
-    const listRaw: any[] = parseIfJSON(result)
-
+    const resultData: ResultStringRS = parseIfJSON(result)
+    
     const printers: Printer[] = [];
-
-    for (let i = 0; i<listRaw.length; i++){
-        const item: any = listRaw[i]
-        const id = encodeBase64(item.Name);
-        
-        printers.push({
-            id,
-            name: item.Name,
-            driver_name: item.DriverName,
-            job_count: item.JobCount,
-            print_processor: item.PrintProcessor,
-            port_name: item.PortName,
-            share_name: item.ShareName,
-            computer_name: item.ComputerName,
-            printer_status: item.PrinterStatus, 
-            shared: item.Shared,
-            type: item.Type,
-            priority: item.Priority
-        })
+    if (resultData.is_unix){
+        const listPrinter = resultData.data.split('\n')
+        console.log(listPrinter)
+        return printers
+    } else {
+        const listRaw = parseIfJSON(resultData.data)
+        for (let i = 0; i<listRaw.length; i++){
+            const item: any = listRaw[i]
+            const id = encodeBase64(item.Name);
+            
+            printers.push({
+                id,
+                name: item.Name,
+                driver_name: item.DriverName,
+                job_count: item.JobCount,
+                print_processor: item.PrintProcessor,
+                port_name: item.PortName,
+                share_name: item.ShareName,
+                computer_name: item.ComputerName,
+                printer_status: item.PrinterStatus, 
+                shared: item.Shared,
+                type: item.Type,
+                priority: item.Priority
+            })
+        }
+        return printers
     }
-    return printers
 }
 /**
  * Get list printers.

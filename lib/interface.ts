@@ -55,3 +55,8 @@ interface ResponseResult {
     message: string|undefined;
     success: boolean;
 }
+
+interface ResultStringRS {
+    is_unix: boolean;
+    data: string;
+}

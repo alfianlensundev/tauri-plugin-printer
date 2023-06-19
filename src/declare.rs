@@ -1,3 +1,6 @@
+
+use serde::{Serialize};
+
 pub struct  PrintSettings {
     pub paper: String,
     pub method: String,
@@ -10,4 +13,10 @@ pub struct PrintOptions {
     pub id: String,
     pub path: String,
     pub print_setting: PrintSettings,
+}
+
+#[derive(Serialize)]
+pub struct ResultString {
+    pub is_unix: bool,
+    pub data: String
 }

@@ -9,6 +9,8 @@ use tauri::{
 
 use std::env;
 
+use crate::declare::ResultString;
+
 #[tauri::command(rename_all = "snake_case")]
 // this will be accessible with `invoke('plugin:printer|create_temp_file')`.
 fn create_temp_file(buffer_data: String, filename: String) -> String {
@@ -35,14 +37,24 @@ fn remove_temp_file(filename: String) -> bool {
 #[tauri::command]
 // this will be accessible with `invoke('plugin:printer|get_printers')`.
 fn get_printers() -> String {
-  if cfg!(windows) {
-      return windows::get_printers();
-  }
-  if cfg!(unix) {
-      return unix::get_printers();
-  }
+    if cfg!(windows) {
+        let result = ResultString{
+            is_unix: false,
+            data: windows::get_printers() 
+        };
 
-  panic!("Unsupported OS");
+        return serde_json::to_string(&result).unwrap();
+    }
+    if cfg!(unix) {
+        let result = ResultString{
+            is_unix: true,
+            data: unix::get_printers()
+        };
+        
+        return serde_json::to_string(&result).unwrap();
+    }
+
+    panic!("Unsupported OS");
 }
 
 #[tauri::command(rename_all = "snake_case")]

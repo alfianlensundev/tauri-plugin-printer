@@ -64,8 +64,7 @@ export const printers = async (id: string|null = null): Promise<Printer[]> => {
     
     const printers: Printer[] = [];
     if (resultData.is_unix){
-        const listPrinter = resultData.data.split('\n')
-        console.log(listPrinter)
+        const listPrinter = resultData.data.split('\n').filter(flt => flt.trim().length > 0)
         for (let i = 0; i<listPrinter.length; i++){
             const printerName: any = listPrinter[i]
             const id = encodeBase64(printerName);

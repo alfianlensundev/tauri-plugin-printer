@@ -1,5 +1,5 @@
 # Tauri Plugin Printer
-Interface with printers through [Powershell](https://learn.microsoft.com/en-us/powershell/scripting/install/installing-powershell-on-windows?view=powershell-7.3)
+Tauri plugin to access printer, jobs, silent print.
 
 ## Install
 > If you are installing from npm and crate.io package registry, make sure the mayor and minor versions for both packages are the same, otherwise, the API may not match.

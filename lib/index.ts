@@ -41,7 +41,6 @@ export const printers = async (id: string|null = null): Promise<Printer[]> => {
             printername
         })
         const item = parseIfJSON(result, null);
-        console.log(item)
         if (item == null) return [];
         return [
             {
@@ -61,7 +60,9 @@ export const printers = async (id: string|null = null): Promise<Printer[]> => {
         ]
     }
     const result: string = await invoke('plugin:printer|get_printers')
+    console.log(result, 'result')
     const listRaw: any[] = parseIfJSON(result)
+
     const printers: Printer[] = [];
 
     for (let i = 0; i<listRaw.length; i++){

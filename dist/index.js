@@ -44,7 +44,6 @@ const printers = async (id = null) => {
             printername
         });
         const item = parseIfJSON(result, null);
-        console.log(item);
         if (item == null)
             return [];
         return [
@@ -65,6 +64,7 @@ const printers = async (id = null) => {
         ];
     }
     const result = await (0, tauri_1.invoke)('plugin:printer|get_printers');
+    console.log(result, 'result');
     const listRaw = parseIfJSON(result);
     const printers = [];
     for (let i = 0; i < listRaw.length; i++) {

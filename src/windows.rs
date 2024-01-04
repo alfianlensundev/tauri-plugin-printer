@@ -49,7 +49,6 @@ pub fn get_printers() -> String {
 
     // Receive the result from the spawned thread
     let result = receiver.recv().unwrap();
-    println!("Result from the spawned thread: {}", result);
 
 
     return result

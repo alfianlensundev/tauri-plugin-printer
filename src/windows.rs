@@ -1,10 +1,11 @@
 
 
 // use std::process::{Command, Stdio};
-use std::io::Write;
+use std::{sync::mpsc, io::Write};
+use std::thread;
 use std::fs::File;
 use std::env;
-use tauri::api::process::{Command};
+use tauri::api::process::Command;
 use crate::{declare::PrintOptions, fsys::remove_file};
 /**
  * Create sm.exe to temp
@@ -34,8 +35,24 @@ pub fn init_windows() {
  * Get printers on windows using powershell
  */
 pub fn get_printers() -> String {
-    let output: tauri::api::process::Output = Command::new("powershell").args(["Get-Printer | Select-Object Name, DriverName, JobCount, PrintProcessor, PortName, ShareName, ComputerName, PrinterStatus, Shared, Type, Priority | ConvertTo-Json"]).output().unwrap();
-    return output.stdout.to_string();
+    // Create a channel for communication
+    let (sender, receiver) = mpsc::channel();
+
+    // Spawn a new thread
+    thread::spawn(move || {
+        let output: tauri::api::process::Output = Command::new("powershell").args(["Get-Printer | Select-Object Name, DriverName, JobCount, PrintProcessor, PortName, ShareName, ComputerName, PrinterStatus, Shared, Type, Priority | ConvertTo-Json"]).output().unwrap();
+
+        sender.send(output.stdout.to_string()).unwrap();
+    });
+
+    // Do other non-blocking work on the main thread
+
+    // Receive the result from the spawned thread
+    let result = receiver.recv().unwrap();
+    println!("Result from the spawned thread: {}", result);
+
+
+    return result
 }
 
 /**
@@ -53,15 +70,30 @@ pub fn print_pdf (options: PrintOptions) -> String {
     let dir: std::path::PathBuf = env::temp_dir();
     let print_setting: String = options.print_setting;
     let shell_command = format!("{}sm.exe -print-to {} {} -silent {}", dir.display(), options.id, print_setting, options.path);
-    println!("{}", shell_command);
     
-    let output: tauri::api::process::Output = Command::new("powershell").args([shell_command]).output().unwrap();
+
+    // Create a channel for communication
+    let (sender, receiver) = mpsc::channel();
+
+    // Spawn a new thread
+    thread::spawn(move || {
+        let output: tauri::api::process::Output = Command::new("powershell").args([shell_command]).output().unwrap();
+
+        sender.send(output.stdout.to_string()).unwrap();
+    });
+
+    // Do other non-blocking work on the main thread
+
+    // Receive the result from the spawned thread
+    let result = receiver.recv().unwrap();
+    
+    
 
     if options.remove_after_print == true {
         let _ = remove_file(&options.path);
     }
     
-    return output.stdout.to_string();
+    return result;
 }
 
 

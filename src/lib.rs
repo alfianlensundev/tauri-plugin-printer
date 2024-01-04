@@ -38,7 +38,7 @@ fn get_printers() -> String {
       return windows::get_printers();
   }
 
-  panic!("Unsupported OS");
+  return "Unsupported OS".to_string();
 }
 
 #[tauri::command(rename_all = "snake_case")]
@@ -48,7 +48,7 @@ fn get_printers_by_name(printername: String) -> String {
       return windows::get_printers_by_name(printername);
   }
 
-  panic!("Unsupported OS");
+  return "Unsupported OS".to_string();
 }
 
 #[tauri::command(rename_all = "snake_case")]
@@ -56,28 +56,19 @@ fn get_printers_by_name(printername: String) -> String {
 fn print_pdf(
     id: String,
     path: String, 
-    printer_setting_paper: String,
-    printer_setting_method: String,
-    printer_setting_scale: String,
-    printer_setting_orientation: String,
-    printer_setting_repeat: u8,
+    printer_setting: String
 ) -> String {
   if cfg!(windows) {
     let options = declare::PrintOptions{
         id,
         path,
-        print_setting: declare::PrintSettings{
-            paper: printer_setting_paper,
-            method: printer_setting_method,
-            scale: printer_setting_scale,
-            orientation: printer_setting_orientation,
-            repeat: printer_setting_repeat
-        }
+        print_setting: printer_setting,
+        remove_after_print: false
     };
     return windows::print_pdf(options);
   }
 
-  panic!("Unsupported OS");
+  return "Unsupported OS".to_string();
 }
 
 
@@ -87,7 +78,7 @@ fn get_jobs(printername: String) -> String {
   if cfg!(windows) {
     return windows::get_jobs(printername);
   }
-  panic!("Unsupported OS");
+  return "Unsupported OS".to_string();
 }
 
 #[tauri::command(rename_all = "snake_case")]
@@ -96,7 +87,7 @@ fn get_jobs_by_id(printername: String, jobid: String) -> String {
   if cfg!(windows) {
     return windows::get_jobs_by_id(printername, jobid);
   }
-  panic!("Unsupported OS");
+  return "Unsupported OS".to_string();
 }
 
 #[tauri::command(rename_all = "snake_case")]
@@ -105,7 +96,7 @@ fn resume_job(printername: String, jobid: String) -> String {
   if cfg!(windows) {
     return windows::resume_job(printername,jobid);
   }
-  panic!("Unsupported OS");
+  return "Unsupported OS".to_string();
 }
 
 #[tauri::command(rename_all = "snake_case")]
@@ -114,7 +105,7 @@ fn restart_job(printername: String, jobid: String) -> String {
   if cfg!(windows) {
     return windows::restart_job(printername,jobid);
   }
-  panic!("Unsupported OS");
+  return "Unsupported OS".to_string();
 }
 
 #[tauri::command(rename_all = "snake_case")]
@@ -123,7 +114,7 @@ fn pause_job(printername: String, jobid: String) -> String {
   if cfg!(windows) {
     return windows::pause_job(printername, jobid);
   }
-  panic!("Unsupported OS");
+  return "Unsupported OS".to_string();
 }
 
 #[tauri::command(rename_all = "snake_case")]
@@ -132,7 +123,7 @@ fn remove_job(printername: String, jobid: String) -> String {
   if cfg!(windows) {
     return windows::remove_job(printername, jobid);
   }
-  panic!("Unsupported OS");
+  return "Unsupported OS".to_string();
 }
 
 pub fn init<R: Runtime>() -> TauriPlugin<R> {

@@ -1,3 +1,4 @@
+import { Jobs, PrintOptions, Printer, ResponseResult } from './interface';
 /**
  * Get list printers.
  *

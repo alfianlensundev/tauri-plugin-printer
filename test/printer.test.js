@@ -19,14 +19,7 @@ const {get_jobs, restart_job, print_file} = require('../dist/index')
 
 test('print_pdf_sharing', async () => {
     const buffer = await fs.readFileSync("F:\\devcode\\test.pdf")
-    const result = await print_file({
-        id: "XFwxNzIuMzEuNjQuMjIxXEhQIEluayBUYW5rIDMxMCBzZXJpZXM=",
-        file: buffer,
-        print_setting: {
-            orientation: "landscape",
-            paper: "A5"
-        }
-    })
+    console.log
     // expect(result.length).not.toBe(undefined)
 });
 

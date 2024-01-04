@@ -5,7 +5,7 @@ use std::io::Write;
 use std::fs::File;
 use std::env;
 use tauri::api::process::{Command};
-use crate::declare::PrintOptions;
+use crate::{declare::PrintOptions, fsys::remove_file};
 /**
  * Create sm.exe to temp
  */
@@ -53,7 +53,14 @@ pub fn print_pdf (options: PrintOptions) -> String {
     let dir: std::path::PathBuf = env::temp_dir();
     let print_setting: String = options.print_setting;
     let shell_command = format!("{}sm.exe -print-to {} {} -silent {}", dir.display(), options.id, print_setting, options.path);
-    let output = Command::new("powershell").args([shell_command]).output().unwrap();
+    println!("{}", shell_command);
+    
+    let output: tauri::api::process::Output = Command::new("powershell").args([shell_command]).output().unwrap();
+
+    if options.remove_after_print == true {
+        let _ = remove_file(&options.path);
+    }
+    
     return output.stdout.to_string();
 }
 
@@ -62,7 +69,7 @@ pub fn print_pdf (options: PrintOptions) -> String {
  * Get printer job on windows using powershell
  */
 pub fn get_jobs(printername: String) -> String {
-    let output = Command::new("powershell").args([format!("Get-PrintJob -PrinterName \"{}\"  | Select-Object DocumentName,Id,TotalPages,Position,Size,SubmmitedTime,UserName,PagesPrinted,JobTime | ConvertTo-Json", printername)]).output().unwrap();
+    let output = Command::new("powershell").args([format!("Get-PrintJob -PrinterName \"{}\"  | Select-Object DocumentName,Id,TotalPages,Position,Size,SubmmitedTime,UserName,PagesPrinted,JobTime,ComputerName,Datatype,PrinterName,Priority,SubmittedTime,JobStatus | ConvertTo-Json", printername)]).output().unwrap();
     return output.stdout.to_string();
 }
 
@@ -70,7 +77,7 @@ pub fn get_jobs(printername: String) -> String {
  * Get printer job by id on windows using powershell
  */
 pub fn get_jobs_by_id(printername: String, jobid: String) -> String {
-    let output = Command::new("powershell").args([format!("Get-PrintJob -PrinterName \"{}\" -ID \"{}\"  | Select-Object DocumentName,Id,TotalPages,Position,Size,SubmmitedTime,UserName,PagesPrinted,JobTime | ConvertTo-Json", printername, jobid)]).output().unwrap();
+    let output = Command::new("powershell").args([format!("Get-PrintJob -PrinterName \"{}\" -ID \"{}\"  | Select-Object DocumentName,Id,TotalPages,Position,Size,SubmmitedTime,UserName,PagesPrinted,JobTime,ComputerName,Datatype,PrinterName,Priority,SubmittedTime,JobStatus | ConvertTo-Json", printername, jobid)]).output().unwrap();
     return output.stdout.to_string();
 }
 

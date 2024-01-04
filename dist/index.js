@@ -127,6 +127,7 @@ const print_file = async (options) => {
         if (options.path.split('.').pop() != 'pdf')
             throw new Error('File not supported');
     }
+    const printerSettingStr = `-print-settings ${printerSettings.paper},${printerSettings.method},${printerSettings.scale},${printerSettings.orientation},${printerSettings.repeat}x`;
     let tempfilename = null;
     let tempPath = "";
     if (typeof options.file != "undefined") {
@@ -147,19 +148,13 @@ const print_file = async (options) => {
     const optionsParams = {
         id: `"${id}"`,
         path: options.path,
-        printer_setting_paper: printerSettings?.paper,
-        printer_setting_method: printerSettings?.method,
-        printer_setting_scale: printerSettings?.scale,
-        printer_setting_orientation: printerSettings?.orientation,
-        printer_setting_repeat: printerSettings?.repeat,
+        printer_setting: printerSettingStr,
+        remove_after_print: options.remove_temp ? options.remove_temp : true
     };
     if (typeof options.file != "undefined") {
         optionsParams.path = tempPath;
     }
     await (0, tauri_1.invoke)('plugin:printer|print_pdf', optionsParams);
-    await (0, tauri_1.invoke)('plugin:printer|remove_temp_file', {
-        filename: tempfilename
-    });
     return {
         success: true,
         message: "OK"

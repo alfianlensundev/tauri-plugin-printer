@@ -1,5 +1,6 @@
 /// <reference types="node" />
-interface Printer {
+import { MethodOption, OrientationOption, PaperOption, ScaleOption } from "./types";
+export interface Printer {
     id: string;
     name: string;
     driver_name: string;
@@ -13,26 +14,27 @@ interface Printer {
     type: number;
     priority: number;
 }
-interface PrintSettings {
-    paper: PaperOption;
-    method: MethodOption;
+export interface PrintSettings {
+    paper?: PaperOption;
+    method?: MethodOption;
     scale?: ScaleOption;
     orientation?: OrientationOption;
     repeat?: Number;
 }
-interface PrintOptions {
+export interface PrintOptions {
     id?: string;
     name?: string;
     path?: string;
     file?: Buffer;
     print_setting?: PrintSettings;
+    remove_temp?: boolean;
 }
-interface JobsStatus {
+export interface JobsStatus {
     code: number;
     name: string;
     description: string;
 }
-interface Jobs {
+export interface Jobs {
     job_status: JobsStatus;
     computer_name: string;
     data_type: string;
@@ -49,7 +51,7 @@ interface Jobs {
     total_pages: number;
     username: string;
 }
-interface ResponseResult {
+export interface ResponseResult {
     message: string | undefined;
     success: boolean;
 }

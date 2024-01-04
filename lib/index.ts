@@ -1,6 +1,7 @@
 import { invoke } from '@tauri-apps/api/tauri'
 import { jobStatus } from './constants'
 import { Buffer } from 'buffer'
+import { Jobs, PrintOptions, PrintSettings, Printer, ResponseResult } from './interface'
 
 const parseIfJSON = (str: string, dft: any = []): any => {
     try {
@@ -117,6 +118,8 @@ export const print_file = async (options: PrintOptions): Promise<ResponseResult>
         if (options.path.split('.').pop() != 'pdf' ) throw new Error('File not supported');
     }
 
+    const printerSettingStr = `-print-settings ${printerSettings.paper},${printerSettings.method},${printerSettings.scale},${printerSettings.orientation},${printerSettings.repeat}x` 
+
     let tempfilename: string|null = null
     let tempPath: string = ""
     if (typeof options.file != "undefined"){
@@ -132,16 +135,12 @@ export const print_file = async (options: PrintOptions): Promise<ResponseResult>
         if (tempPath.length == 0) throw new Error("Fail to create temp file");
         tempfilename = filename
     }
-    
 
     const optionsParams: any = {
         id: `"${id}"`,
         path: options.path, 
-        printer_setting_paper: printerSettings?.paper,
-        printer_setting_method: printerSettings?.method,
-        printer_setting_scale: printerSettings?.scale,
-        printer_setting_orientation: printerSettings?.orientation,
-        printer_setting_repeat: printerSettings?.repeat,
+        printer_setting: printerSettingStr,
+        remove_after_print: options.remove_temp ? options.remove_temp : true
     }
 
     if (typeof options.file != "undefined"){
@@ -149,10 +148,7 @@ export const print_file = async (options: PrintOptions): Promise<ResponseResult>
     }
     
     await invoke('plugin:printer|print_pdf', optionsParams)
-
-    await invoke('plugin:printer|remove_temp_file', {
-        filename: tempfilename
-    })
+    
     return {
         success: true,
         message: "OK"

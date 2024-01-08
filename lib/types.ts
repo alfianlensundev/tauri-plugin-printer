@@ -1,3 +1,5 @@
+import { PrintSettings } from "./interface";
+
 export type ScaleOption = "noscale" | "shrink" | "fit"
 export type MethodOption = "duplex" | "duplexshort" | "simplex"
 export type PaperOption = "A2" | "A3" | "A4" | "A5" | "A6" | "letter" | "legal" | "tabloid"
@@ -419,4 +421,18 @@ export type PrintMargin = {
     bottom?: number;
     right?: number;
     left?: number;
+}
+
+export interface SizeOptions {
+    height: number;
+    width: number;
+}
+
+export type PrintOptionsV2 = {
+    id?: string;
+    name?: string;
+    print_setting?: PrintSettings;
+    preview: boolean;
+    page_size?: PaperOption | SizeOptions;
+    remove_temp?: boolean;
 }

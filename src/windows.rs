@@ -48,7 +48,7 @@ pub fn get_printers() -> String {
     // Do other non-blocking work on the main thread
 
     // Receive the result from the spawned thread
-    let result = receiver.recv().unwrap();
+    let result: String = receiver.recv().unwrap();
 
 
     return result
@@ -73,7 +73,7 @@ pub fn print_pdf (options: PrintOptions) -> String {
 
     // Create a channel for communication
     let (sender, receiver) = mpsc::channel();
-
+    println!("{}", shell_command);
     // Spawn a new thread
     thread::spawn(move || {
         let output: tauri::api::process::Output = Command::new("powershell").args([shell_command]).output().unwrap();

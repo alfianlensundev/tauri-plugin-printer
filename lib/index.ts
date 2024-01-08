@@ -101,91 +101,7 @@ export const printers = async (id: string|null = null): Promise<Printer[]> => {
  * @returns A process status.
  */
 // export const print = async (data: PrintData, options: PrintOptions) => {
-export const print = async (data: PrintData, options: PrintOptions) => {
-    const dataTest: PrintData[] = [
-        {
-            type: 'image',
-            url: 'https://randomuser.me/api/portraits/men/43.jpg',     // file path
-            position: 'center',                                  // position of image: 'left' | 'center' | 'right'
-            width: 60,                                           // width of image in px; default: auto
-            height: 160, 
-            style: {
-                objectFit: 'contain'
-            }                                         // width of image in px; default: 50 or '50px'
-        },
-        {
-            type: 'text',                                       // 'text' | 'barCode' | 'qrCode' | 'image' | 'table
-            value: 'SAMPLE HEAawdawdDING',
-            style: {fontWeight: "700", textAlign: 'center', fontSize: "24px"}
-        },
-        {
-            type: 'text',                                       // 'text' | 'barCode' | 'qrCode' | 'image' | 'table
-            value: 'SAMPLE HEAawdawdDING',
-            style: {fontWeight: "700", textAlign: 'center', fontSize: "24px"}
-        },
-        {
-            type: 'text',                                       // 'text' | 'barCode' | 'qrCode' | 'image' | 'table
-            value: 'SAMPLE HEAawdawdDING',
-            style: {fontWeight: "700", textAlign: 'center', fontSize: "24px"}
-        },
-        {
-            type: 'text',                                       // 'text' | 'barCode' | 'qrCode' | 'image' | 'table
-            value: 'SAMPLE HEAawdawdDING',
-            style: {fontWeight: "700", textAlign: 'center', fontSize: "24px"}
-        },
-        {
-            type: 'text',                                       // 'text' | 'barCode' | 'qrCode' | 'image' | 'table
-            value: 'SAMPLE HEAawdawdDING',
-            style: {fontWeight: "700", textAlign: 'center', fontSize: "24px"}
-        },
-        {
-            type: 'text',                                       // 'text' | 'barCode' | 'qrCode' | 'image' | 'table
-            value: 'SAMPLE HEAawdawdDING',
-            style: {fontWeight: "700", textAlign: 'center', fontSize: "24px"}
-        },
-        {
-            type: 'text',                                       // 'text' | 'barCode' | 'qrCode' | 'image' | 'table
-            value: 'SAMPLE HEAawdawdDING',
-            style: {fontWeight: "700", textAlign: 'center', fontSize: "24px"}
-        },
-        {
-            type: 'text',                                       // 'text' | 'barCode' | 'qrCode' | 'image' | 'table
-            value: 'SAMPLE HEAawdawdDING',
-            style: {fontWeight: "700", textAlign: 'center', fontSize: "24px"}
-        },
-        {
-            type: 'text',                                       // 'text' | 'barCode' | 'qrCode' | 'image' | 'table
-            value: 'SAMPLE HEAawdawdDING',
-            style: {fontWeight: "700", textAlign: 'center', fontSize: "24px"}
-        },
-        {
-            type: 'text',                                       // 'text' | 'barCode' | 'qrCode' | 'image' | 'table
-            value: 'SAMPLE HEAawdawdDING',
-            style: {fontWeight: "700", textAlign: 'center', fontSize: "24px"}
-        },
-        {
-            type: 'text',                                       // 'text' | 'barCode' | 'qrCode' | 'image' | 'table
-            value: 'SAMPLE HEAawdawdDING',
-            style: {fontWeight: "700", textAlign: 'center', fontSize: "24px"}
-        },
-        {
-            type: 'text',                       // 'text' | 'barCode' | 'qrCode' | 'image' | 'table'
-            value: 'Secondary text',
-            style: {textDecoration: "underline", fontSize: "10px", textAlign: "center", color: "red"}
-        },{
-            type: 'barCode',
-            value: '023456789010',
-            height: 40,                       // width of barcode, applicable only to bar and QR codes
-            displayValue: true,             // Display value below barcode
-            fontsize: 12,
-        },{
-            type: 'qrCode',
-            value: 'https://github.com/Hubertformin/electron-pos-printer',
-            height: 100,
-            width: 100,
-            position: 'center',
-            style: { margin: '10 20px 20 20px' }
-    }]
+export const print = async (data: PrintData[], options: PrintOptions) => {
     const html = document.createElement('html')
     const container = document.createElement("div")
     container.id = "wrapper"
@@ -202,7 +118,7 @@ export const print = async (data: PrintData, options: PrintOptions) => {
     container.style.fontSize = '12px'
     
 
-    for (const item of dataTest){
+    for (const item of data){
         if (item.type == 'image'){
             const wrapperImage = document.createElement('div')
             wrapperImage.style.width = "100%"

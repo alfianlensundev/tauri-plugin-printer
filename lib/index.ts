@@ -2,7 +2,15 @@ import { invoke } from '@tauri-apps/api/tauri'
 import { jobStatus } from './constants'
 import { Buffer } from 'buffer'
 import { Jobs, PrintOptions, PrintSettings, Printer, ResponseResult } from './interface'
-
+import { PrintData } from './types'
+import { ResponseType, getClient } from '@tauri-apps/api/http';
+import mime from "mime";
+import {toDataURL as qrCodeToDataUrl} from 'qrcode'
+import * as JsBarcode from "jsbarcode";
+import { WebviewWindow } from '@tauri-apps/api/window'
+import * as _html2canvas from "html2canvas";
+const html2canvas: any = _html2canvas;
+import jsPDF from 'jspdf'
 const parseIfJSON = (str: string, dft: any = []): any => {
     try {
         return JSON.parse(str)
@@ -85,8 +93,294 @@ export const printers = async (id: string|null = null): Promise<Printer[]> => {
     }
     return printers
 }
+
+
 /**
- * Get list printers.
+ * Print.
+ * @params first_param: File Path, second_param: Print Setting
+ * @returns A process status.
+ */
+// export const print = async (data: PrintData, options: PrintOptions) => {
+export const print = async () => {
+    const dataTest: PrintData[] = [
+        {
+            type: 'image',
+            url: 'https://randomuser.me/api/portraits/men/43.jpg',     // file path
+            position: 'center',                                  // position of image: 'left' | 'center' | 'right'
+            width: 60,                                           // width of image in px; default: auto
+            height: 160, 
+            style: {
+                objectFit: 'contain'
+            }                                         // width of image in px; default: 50 or '50px'
+        },
+        {
+            type: 'text',                                       // 'text' | 'barCode' | 'qrCode' | 'image' | 'table
+            value: 'SAMPLE HEAawdawdDING',
+            style: {fontWeight: "700", textAlign: 'center', fontSize: "24px"}
+        },
+        {
+            type: 'text',                                       // 'text' | 'barCode' | 'qrCode' | 'image' | 'table
+            value: 'SAMPLE HEAawdawdDING',
+            style: {fontWeight: "700", textAlign: 'center', fontSize: "24px"}
+        },
+        {
+            type: 'text',                                       // 'text' | 'barCode' | 'qrCode' | 'image' | 'table
+            value: 'SAMPLE HEAawdawdDING',
+            style: {fontWeight: "700", textAlign: 'center', fontSize: "24px"}
+        },
+        {
+            type: 'text',                                       // 'text' | 'barCode' | 'qrCode' | 'image' | 'table
+            value: 'SAMPLE HEAawdawdDING',
+            style: {fontWeight: "700", textAlign: 'center', fontSize: "24px"}
+        },
+        {
+            type: 'text',                                       // 'text' | 'barCode' | 'qrCode' | 'image' | 'table
+            value: 'SAMPLE HEAawdawdDING',
+            style: {fontWeight: "700", textAlign: 'center', fontSize: "24px"}
+        },
+        {
+            type: 'text',                                       // 'text' | 'barCode' | 'qrCode' | 'image' | 'table
+            value: 'SAMPLE HEAawdawdDING',
+            style: {fontWeight: "700", textAlign: 'center', fontSize: "24px"}
+        },
+        {
+            type: 'text',                                       // 'text' | 'barCode' | 'qrCode' | 'image' | 'table
+            value: 'SAMPLE HEAawdawdDING',
+            style: {fontWeight: "700", textAlign: 'center', fontSize: "24px"}
+        },
+        {
+            type: 'text',                                       // 'text' | 'barCode' | 'qrCode' | 'image' | 'table
+            value: 'SAMPLE HEAawdawdDING',
+            style: {fontWeight: "700", textAlign: 'center', fontSize: "24px"}
+        },
+        {
+            type: 'text',                                       // 'text' | 'barCode' | 'qrCode' | 'image' | 'table
+            value: 'SAMPLE HEAawdawdDING',
+            style: {fontWeight: "700", textAlign: 'center', fontSize: "24px"}
+        },
+        {
+            type: 'text',                                       // 'text' | 'barCode' | 'qrCode' | 'image' | 'table
+            value: 'SAMPLE HEAawdawdDING',
+            style: {fontWeight: "700", textAlign: 'center', fontSize: "24px"}
+        },
+        {
+            type: 'text',                                       // 'text' | 'barCode' | 'qrCode' | 'image' | 'table
+            value: 'SAMPLE HEAawdawdDING',
+            style: {fontWeight: "700", textAlign: 'center', fontSize: "24px"}
+        },
+        {
+            type: 'text',                       // 'text' | 'barCode' | 'qrCode' | 'image' | 'table'
+            value: 'Secondary text',
+            style: {textDecoration: "underline", fontSize: "10px", textAlign: "center", color: "red"}
+        },{
+            type: 'barCode',
+            value: '023456789010',
+            height: 40,                       // width of barcode, applicable only to bar and QR codes
+            displayValue: true,             // Display value below barcode
+            fontsize: 12,
+        },{
+            type: 'qrCode',
+            value: 'https://github.com/Hubertformin/electron-pos-printer',
+            height: 100,
+            width: 100,
+            position: 'center',
+            style: { margin: '10 20px 20 20px' }
+    }]
+    const html = document.createElement('html')
+    const container = document.createElement("div")
+    container.id = "wrapper"
+    container.style.position = "relative"
+    container.style.display = "flex"
+    container.style.backgroundColor = "#fff"
+    container.style.flexDirection = "column"
+    container.style.alignItems = "center"
+    container.style.justifyContent = "flex-start"
+    container.style.overflow = 'hidden'
+    container.style.width = `300px`
+    container.style.height = "fit-content"
+    container.style.color = "#000"
+    container.style.fontSize = '12px'
+    
+
+    for (const item of dataTest){
+        if (item.type == 'image'){
+            const wrapperImage = document.createElement('div')
+            wrapperImage.style.width = "100%"
+            if (item?.position == "center"){
+                wrapperImage.style.display = 'flex'
+                wrapperImage.style.justifyContent = 'center'
+            }
+
+            if (typeof item.url == "undefined") throw new Error('Image required {url}')
+            const image: any = document.createElement('img')
+            image.width = 100,
+            image.height = 100
+            const client = await getClient();
+            const response: any = await client.get(item.url, {
+                responseType: ResponseType.Binary
+            });
+
+            image.src = `data:${mime.getType(item.url)};base64,${Buffer.from(response.data).toString('base64')}`
+            if (item.width){
+                image.width = item.width
+            }
+
+            if (item.height){
+                image.height = item.height
+            }
+
+            if (item.style){
+                const styles = item.style as any
+                for (const style of Object.keys(styles)){
+                    const key = style as any
+                    image.style[key] = styles[key]
+                }
+            }
+            wrapperImage.appendChild(image)
+
+            container.appendChild(wrapperImage)
+        }
+
+        if (item.type == 'text'){
+            const textWrapper = document.createElement('div')
+            textWrapper.style.width = "100%"
+            
+            if (item.value){
+                textWrapper.innerHTML = item.value
+            }
+
+            if (item.style){
+                const styles = item.style as any
+                for (const style of Object.keys(styles)){
+                    const key = style as any
+                    textWrapper.style[key] = styles[key]
+                }
+            }
+
+            container.appendChild(textWrapper)
+        }
+        
+        if (item.type == 'qrCode'){
+            const wrapperImage = document.createElement('div')
+            wrapperImage.style.width = "100%"
+            if (item?.position == "center"){
+                wrapperImage.style.display = 'flex'
+                wrapperImage.style.justifyContent = 'center'
+            }
+            const image = document.createElement('img')
+            const canvas = document.createElement('canvas')
+            image.src = await new Promise((rs, rj) => {
+                qrCodeToDataUrl(canvas, item.value ? item.value : "", (err, url) => {
+                    if (err) rj(err)
+                    rs(url)
+                })
+            })
+
+            if (item.width){
+                image.width = item.width
+            }
+
+            if (item.height){
+                image.height = item.height
+            }
+            
+            if (item.style){
+                const styles = item.style as any
+                for (const style of Object.keys(styles)){
+                    const key = style as any
+                    image.style[key] = styles[key]
+                }
+            }
+            
+            wrapperImage.appendChild(image)
+
+            container.appendChild(wrapperImage)
+        }
+
+        if (item.type == 'barCode'){
+            const wrapperImage = document.createElement('div')
+            wrapperImage.style.width = "100%"
+            if (item?.position == "center"){
+                wrapperImage.style.display = 'flex'
+                wrapperImage.style.justifyContent = 'center'
+            }
+            const image = document.createElement('img')
+            JsBarcode(image, item.value ? item.value : "", {
+                width: item.width ? item.width : 4,
+                height: item.height ? item.height : 40,
+                displayValue: item.displayValue
+            });
+
+            image.style.objectFit = "contain"
+            image.style.width = '100%'
+
+            if (item.height){
+                image.height = item.height
+            }
+            
+            if (item.style){
+                const styles = item.style as any
+                for (const style of Object.keys(styles)){
+                    const key = style as any
+                    image.style[key] = styles[key]
+                }
+            }
+            
+            wrapperImage.appendChild(image)
+
+            container.appendChild(wrapperImage)
+        }
+    }
+
+    const body = document.createElement('body')
+    body.appendChild(container)
+    html.appendChild(body)
+    body.style.overflowX = "hidden"
+    const htmlData = html.outerHTML
+    const hidder: any = document.createElement('div')
+    hidder.style.width = 0
+    hidder.style.height = 0
+    hidder.style.overflow = 'hidden'
+    hidder.appendChild(container)
+    document.body.appendChild(hidder)
+    const wrapper: any = document.querySelector('#wrapper')
+    const webview = new WebviewWindow(Date.now().toString(), {
+        url: `data:text/html,${htmlData}`,
+        title: "Print Preview",
+        width: wrapper.clientWidth,
+        height: wrapper.clientHeight,
+        // visible: false
+    })
+    const componentWidth = wrapper.clientWidth;
+    const componentHeight = wrapper.clientHeight;
+
+    const ratio = componentHeight / componentWidth;
+    const height = ratio * componentWidth;
+
+    const canvas = await html2canvas(wrapper, {
+        scale: 5,
+    })
+    const imgData = canvas.toDataURL('image/jpeg')
+
+    const pdf = new jsPDF({
+        orientation: "portrait",
+        unit: 'px',
+        format: [componentWidth, height]
+    })
+
+    pdf.addImage(imgData, 'JPEG', 0, 0, componentWidth, height)
+    const buffer = pdf.output('arraybuffer')
+    wrapper.remove()
+    webview.once('tauri://created', function () {
+    // webview window successfully created
+    })
+    webview.once('tauri://error', function (e) {
+        console.log(e)
+    })
+}
+
+/**
+ * Print File.
  * @params first_param: File Path, second_param: Print Setting
  * @returns A process status.
  */

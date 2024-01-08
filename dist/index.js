@@ -1,9 +1,17 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.remove_job = exports.pause_job = exports.resume_job = exports.restart_job = exports.job = exports.jobs = exports.print_file = exports.printers = void 0;
+exports.remove_job = exports.pause_job = exports.resume_job = exports.restart_job = exports.job = exports.jobs = exports.print_file = exports.print = exports.printers = void 0;
 const tauri_1 = require("@tauri-apps/api/tauri");
 const constants_1 = require("./constants");
 const buffer_1 = require("buffer");
+const http_1 = require("@tauri-apps/api/http");
+const mime_1 = require("mime");
+const qrcode_1 = require("qrcode");
+const JsBarcode = require("jsbarcode");
+const window_1 = require("@tauri-apps/api/window");
+const _html2canvas = require("html2canvas");
+const html2canvas = _html2canvas;
+const jspdf_1 = require("jspdf");
 const parseIfJSON = (str, dft = []) => {
     try {
         return JSON.parse(str);
@@ -88,7 +96,266 @@ const printers = async (id = null) => {
 };
 exports.printers = printers;
 /**
- * Get list printers.
+ * Print.
+ * @params first_param: File Path, second_param: Print Setting
+ * @returns A process status.
+ */
+// export const print = async (data: PrintData, options: PrintOptions) => {
+const print = async () => {
+    const dataTest = [
+        {
+            type: 'image',
+            url: 'https://randomuser.me/api/portraits/men/43.jpg',
+            position: 'center',
+            width: 60,
+            height: 160,
+            style: {
+                objectFit: 'contain'
+            } // width of image in px; default: 50 or '50px'
+        },
+        {
+            type: 'text',
+            value: 'SAMPLE HEAawdawdDING',
+            style: { fontWeight: "700", textAlign: 'center', fontSize: "24px" }
+        },
+        {
+            type: 'text',
+            value: 'SAMPLE HEAawdawdDING',
+            style: { fontWeight: "700", textAlign: 'center', fontSize: "24px" }
+        },
+        {
+            type: 'text',
+            value: 'SAMPLE HEAawdawdDING',
+            style: { fontWeight: "700", textAlign: 'center', fontSize: "24px" }
+        },
+        {
+            type: 'text',
+            value: 'SAMPLE HEAawdawdDING',
+            style: { fontWeight: "700", textAlign: 'center', fontSize: "24px" }
+        },
+        {
+            type: 'text',
+            value: 'SAMPLE HEAawdawdDING',
+            style: { fontWeight: "700", textAlign: 'center', fontSize: "24px" }
+        },
+        {
+            type: 'text',
+            value: 'SAMPLE HEAawdawdDING',
+            style: { fontWeight: "700", textAlign: 'center', fontSize: "24px" }
+        },
+        {
+            type: 'text',
+            value: 'SAMPLE HEAawdawdDING',
+            style: { fontWeight: "700", textAlign: 'center', fontSize: "24px" }
+        },
+        {
+            type: 'text',
+            value: 'SAMPLE HEAawdawdDING',
+            style: { fontWeight: "700", textAlign: 'center', fontSize: "24px" }
+        },
+        {
+            type: 'text',
+            value: 'SAMPLE HEAawdawdDING',
+            style: { fontWeight: "700", textAlign: 'center', fontSize: "24px" }
+        },
+        {
+            type: 'text',
+            value: 'SAMPLE HEAawdawdDING',
+            style: { fontWeight: "700", textAlign: 'center', fontSize: "24px" }
+        },
+        {
+            type: 'text',
+            value: 'SAMPLE HEAawdawdDING',
+            style: { fontWeight: "700", textAlign: 'center', fontSize: "24px" }
+        },
+        {
+            type: 'text',
+            value: 'Secondary text',
+            style: { textDecoration: "underline", fontSize: "10px", textAlign: "center", color: "red" }
+        }, {
+            type: 'barCode',
+            value: '023456789010',
+            height: 40,
+            displayValue: true,
+            fontsize: 12,
+        }, {
+            type: 'qrCode',
+            value: 'https://github.com/Hubertformin/electron-pos-printer',
+            height: 100,
+            width: 100,
+            position: 'center',
+            style: { margin: '10 20px 20 20px' }
+        }
+    ];
+    const html = document.createElement('html');
+    const container = document.createElement("div");
+    container.id = "wrapper";
+    container.style.position = "relative";
+    container.style.display = "flex";
+    container.style.backgroundColor = "#fff";
+    container.style.flexDirection = "column";
+    container.style.alignItems = "center";
+    container.style.justifyContent = "flex-start";
+    container.style.overflow = 'hidden';
+    container.style.width = `300px`;
+    container.style.height = "fit-content";
+    container.style.color = "#000";
+    container.style.fontSize = '12px';
+    for (const item of dataTest) {
+        if (item.type == 'image') {
+            const wrapperImage = document.createElement('div');
+            wrapperImage.style.width = "100%";
+            if (item?.position == "center") {
+                wrapperImage.style.display = 'flex';
+                wrapperImage.style.justifyContent = 'center';
+            }
+            if (typeof item.url == "undefined")
+                throw new Error('Image required {url}');
+            const image = document.createElement('img');
+            image.width = 100,
+                image.height = 100;
+            const client = await (0, http_1.getClient)();
+            const response = await client.get(item.url, {
+                responseType: http_1.ResponseType.Binary
+            });
+            image.src = `data:${mime_1.default.getType(item.url)};base64,${buffer_1.Buffer.from(response.data).toString('base64')}`;
+            if (item.width) {
+                image.width = item.width;
+            }
+            if (item.height) {
+                image.height = item.height;
+            }
+            if (item.style) {
+                const styles = item.style;
+                for (const style of Object.keys(styles)) {
+                    const key = style;
+                    image.style[key] = styles[key];
+                }
+            }
+            wrapperImage.appendChild(image);
+            container.appendChild(wrapperImage);
+        }
+        if (item.type == 'text') {
+            const textWrapper = document.createElement('div');
+            textWrapper.style.width = "100%";
+            if (item.value) {
+                textWrapper.innerHTML = item.value;
+            }
+            if (item.style) {
+                const styles = item.style;
+                for (const style of Object.keys(styles)) {
+                    const key = style;
+                    textWrapper.style[key] = styles[key];
+                }
+            }
+            container.appendChild(textWrapper);
+        }
+        if (item.type == 'qrCode') {
+            const wrapperImage = document.createElement('div');
+            wrapperImage.style.width = "100%";
+            if (item?.position == "center") {
+                wrapperImage.style.display = 'flex';
+                wrapperImage.style.justifyContent = 'center';
+            }
+            const image = document.createElement('img');
+            const canvas = document.createElement('canvas');
+            image.src = await new Promise((rs, rj) => {
+                (0, qrcode_1.toDataURL)(canvas, item.value ? item.value : "", (err, url) => {
+                    if (err)
+                        rj(err);
+                    rs(url);
+                });
+            });
+            if (item.width) {
+                image.width = item.width;
+            }
+            if (item.height) {
+                image.height = item.height;
+            }
+            if (item.style) {
+                const styles = item.style;
+                for (const style of Object.keys(styles)) {
+                    const key = style;
+                    image.style[key] = styles[key];
+                }
+            }
+            wrapperImage.appendChild(image);
+            container.appendChild(wrapperImage);
+        }
+        if (item.type == 'barCode') {
+            const wrapperImage = document.createElement('div');
+            wrapperImage.style.width = "100%";
+            if (item?.position == "center") {
+                wrapperImage.style.display = 'flex';
+                wrapperImage.style.justifyContent = 'center';
+            }
+            const image = document.createElement('img');
+            JsBarcode(image, item.value ? item.value : "", {
+                width: item.width ? item.width : 4,
+                height: item.height ? item.height : 40,
+                displayValue: item.displayValue
+            });
+            image.style.objectFit = "contain";
+            image.style.width = '100%';
+            if (item.height) {
+                image.height = item.height;
+            }
+            if (item.style) {
+                const styles = item.style;
+                for (const style of Object.keys(styles)) {
+                    const key = style;
+                    image.style[key] = styles[key];
+                }
+            }
+            wrapperImage.appendChild(image);
+            container.appendChild(wrapperImage);
+        }
+    }
+    const body = document.createElement('body');
+    body.appendChild(container);
+    html.appendChild(body);
+    body.style.overflowX = "hidden";
+    const htmlData = html.outerHTML;
+    const hidder = document.createElement('div');
+    hidder.style.width = 0;
+    hidder.style.height = 0;
+    hidder.style.overflow = 'hidden';
+    hidder.appendChild(container);
+    document.body.appendChild(hidder);
+    const wrapper = document.querySelector('#wrapper');
+    const webview = new window_1.WebviewWindow(Date.now().toString(), {
+        url: `data:text/html,${htmlData}`,
+        title: "Print Preview",
+        width: wrapper.clientWidth,
+        height: wrapper.clientHeight,
+        // visible: false
+    });
+    const componentWidth = wrapper.clientWidth;
+    const componentHeight = wrapper.clientHeight;
+    const ratio = componentHeight / componentWidth;
+    const height = ratio * componentWidth;
+    const canvas = await html2canvas(wrapper, {
+        scale: 5,
+    });
+    const imgData = canvas.toDataURL('image/jpeg');
+    const pdf = new jspdf_1.default({
+        orientation: "portrait",
+        unit: 'px',
+        format: [componentWidth, height]
+    });
+    pdf.addImage(imgData, 'JPEG', 0, 0, componentWidth, height);
+    const buffer = pdf.output('arraybuffer');
+    wrapper.remove();
+    webview.once('tauri://created', function () {
+        // webview window successfully created
+    });
+    webview.once('tauri://error', function (e) {
+        console.log(e);
+    });
+};
+exports.print = print;
+/**
+ * Print File.
  * @params first_param: File Path, second_param: Print Setting
  * @returns A process status.
  */

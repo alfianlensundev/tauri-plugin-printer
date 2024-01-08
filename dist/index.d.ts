@@ -1,4 +1,5 @@
 import { Jobs, PrintOptions, Printer, ResponseResult } from './interface';
+import { PrintData } from './types';
 /**
  * Get list printers.
  *
@@ -10,7 +11,10 @@ export declare const printers: (id?: string | null) => Promise<Printer[]>;
  * @params first_param: File Path, second_param: Print Setting
  * @returns A process status.
  */
-export declare const print: () => Promise<void>;
+export declare const print: (data: PrintData, options: PrintOptions) => Promise<{
+    success: boolean;
+    message: string;
+}>;
 /**
  * Print File.
  * @params first_param: File Path, second_param: Print Setting

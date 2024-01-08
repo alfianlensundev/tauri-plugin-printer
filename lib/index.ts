@@ -101,7 +101,7 @@ export const printers = async (id: string|null = null): Promise<Printer[]> => {
  * @returns A process status.
  */
 // export const print = async (data: PrintData, options: PrintOptions) => {
-export const print = async () => {
+export const print = async (data: PrintData, options: PrintOptions) => {
     const dataTest: PrintData[] = [
         {
             type: 'image',
@@ -351,6 +351,12 @@ export const print = async () => {
         height: wrapper.clientHeight,
         // visible: false
     })
+    webview.once('tauri://created', function () {
+    // webview window successfully created
+    })
+    webview.once('tauri://error', function (e) {
+        console.log(e)
+    })
     const componentWidth = wrapper.clientWidth;
     const componentHeight = wrapper.clientHeight;
 
@@ -371,12 +377,53 @@ export const print = async () => {
     pdf.addImage(imgData, 'JPEG', 0, 0, componentWidth, height)
     const buffer = pdf.output('arraybuffer')
     wrapper.remove()
-    webview.once('tauri://created', function () {
-    // webview window successfully created
+
+    let id: string | undefined = "";
+    if (typeof options.id != 'undefined'){
+        id = decodeBase64(options.id);
+    } else {
+        id = options.name
+    }
+    // 
+    const printerSettings: PrintSettings = {
+        paper: 'A4',
+        method: 'simplex',
+        scale: 'noscale',
+        orientation: 'portrait',
+        repeat: 1
+    }
+    if (typeof options?.print_setting?.paper != "undefined") printerSettings.paper = options.print_setting.paper;
+    if (typeof options?.print_setting?.method != "undefined") printerSettings.method = options.print_setting.method;
+    if (typeof options?.print_setting?.scale != "undefined") printerSettings.scale = options.print_setting.scale;
+    if (typeof options?.print_setting?.orientation != "undefined") printerSettings.orientation = options.print_setting.orientation;
+    if (typeof options?.print_setting?.repeat != "undefined") printerSettings.repeat = options.print_setting.repeat;
+    
+    const printerSettingStr = `-print-settings ${printerSettings.paper},${printerSettings.method},${printerSettings.scale},${printerSettings.orientation},${printerSettings.repeat}x` 
+
+    const filename: string = `${Math.floor(Math.random() * 100000000)}_${Date.now()}.pdf`;
+    const tempPath: string = await invoke('plugin:printer|create_temp_file', {
+        buffer_data: Buffer.from(buffer).toString('base64'),
+        filename
     })
-    webview.once('tauri://error', function (e) {
-        console.log(e)
-    })
+
+    if (tempPath.length == 0) throw new Error("Fail to create temp file");
+
+    const optionsParams: any = {
+        id: `"${id}"`,
+        path: tempPath,
+        printer_setting: printerSettingStr,
+        remove_after_print: options.remove_temp ? options.remove_temp : true
+    }
+
+    if (typeof options.file != "undefined"){
+        optionsParams.path = tempPath
+    }
+    
+    await invoke('plugin:printer|print_pdf', optionsParams)
+    return {
+        success: true,
+        message: "OK"
+    }
 }
 
 /**

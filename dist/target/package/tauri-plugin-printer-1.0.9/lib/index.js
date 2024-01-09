@@ -276,12 +276,16 @@ const print = async (data, options) => {
     hidder.appendChild(container);
     document.body.appendChild(hidder);
     const wrapper = document.querySelector('#wrapper');
-    if (options.preview == true) {
+    if (options.preview) {
         const webview = new window_1.WebviewWindow(Date.now().toString(), {
             url: `data:text/html,${htmlData}`,
             title: "Print Preview",
             width: wrapper.clientWidth,
             height: wrapper.clientHeight,
+            // visible: false
+        });
+        webview.once('tauri://created', function () {
+            // webview window successfully created
         });
         webview.once('tauri://error', function (e) {
             console.log(e);

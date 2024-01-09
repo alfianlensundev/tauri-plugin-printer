@@ -441,7 +441,6 @@ export const print_file = async (options: PrintFileOptions): Promise<ResponseRes
 
     const printerSettingStr = `-print-settings ${printerSettings.paper},${printerSettings.method},${printerSettings.scale},${printerSettings.orientation},${printerSettings.repeat}x` 
 
-    let tempfilename: string|null = null
     let tempPath: string = ""
     if (typeof options.file != "undefined"){
         const fileSignature = options.file.subarray(0, 4).toString('hex');
@@ -454,7 +453,6 @@ export const print_file = async (options: PrintFileOptions): Promise<ResponseRes
         })
 
         if (tempPath.length == 0) throw new Error("Fail to create temp file");
-        tempfilename = filename
     }
 
     const optionsParams: any = {

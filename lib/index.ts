@@ -438,8 +438,19 @@ export const print_file = async (options: PrintFileOptions): Promise<ResponseRes
         if (options.path.split('.').length <= 1) throw new Error('File not supported');
         if (options.path.split('.').pop() != 'pdf' ) throw new Error('File not supported');
     }
-
-    const printerSettingStr = `-print-settings ${printerSettings.paper},${printerSettings.method},${printerSettings.scale},${printerSettings.orientation},${printerSettings.repeat}x` 
+    let rangeStr = ""
+    if (printerSettings.range){
+        if (typeof printerSettings.range == 'string'){
+            if (!(new RegExp(/^[0-9,]+$/).test(printerSettings.range))) throw new Error('Invalid range value ')
+            rangeStr = printerSettings.range[printerSettings.range.length-1] != "," ? printerSettings.range : printerSettings.range.substring(0, printerSettings.range.length-1)     
+        }
+        else
+        if (printerSettings.range.from){
+            rangeStr = `${printerSettings.range.from}-${printerSettings.range.to}`
+        }
+    }
+    
+    const printerSettingStr = `-print-settings ${rangeStr},${printerSettings.paper},${printerSettings.method},${printerSettings.scale},${printerSettings.orientation},${printerSettings.repeat}x` 
 
     let tempPath: string = ""
     if (typeof options.file != "undefined"){

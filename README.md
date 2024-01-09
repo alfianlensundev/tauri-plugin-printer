@@ -23,7 +23,7 @@ Or add the following to your `Cargo.toml` for spesific version:
 
 ```toml
 [dependencies]
-tauri-plugin-printer = { version = "1.0.7" }
+tauri-plugin-printer = { version = "1.0.8" }
 ```
 
 You can install the JavaScript Guest bindings using your preferred JavaScript package manager:

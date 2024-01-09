@@ -56,14 +56,15 @@ fn get_printers_by_name(printername: String) -> String {
 fn print_pdf(
     id: String,
     path: String, 
-    printer_setting: String
+    printer_setting: String,
+    remove_after_print: bool
 ) -> String {
   if cfg!(windows) {
     let options = declare::PrintOptions{
         id,
         path,
         print_setting: printer_setting,
-        remove_after_print: false
+        remove_after_print: remove_after_print
     };
     return windows::print_pdf(options);
   }

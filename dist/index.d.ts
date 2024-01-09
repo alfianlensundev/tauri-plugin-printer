@@ -1,4 +1,4 @@
-import { Jobs, PrintOptions, Printer, ResponseResult } from './interface';
+import { Jobs, PrintFileOptions, PrintOptions, Printer, ResponseResult } from './types';
 import { PrintData } from './types';
 /**
  * Get list printers.
@@ -8,19 +8,16 @@ import { PrintData } from './types';
 export declare const printers: (id?: string | null) => Promise<Printer[]>;
 /**
  * Print.
- * @params first_param: File Path, second_param: Print Setting
+ * @params first_param:dataprint, second_param: Print Options
  * @returns A process status.
  */
-export declare const print: (data: PrintData, options: PrintOptions) => Promise<{
-    success: boolean;
-    message: string;
-}>;
+export declare const print: (data: PrintData[], options: PrintOptions) => Promise<ResponseResult>;
 /**
  * Print File.
  * @params first_param: File Path, second_param: Print Setting
  * @returns A process status.
  */
-export declare const print_file: (options: PrintOptions) => Promise<ResponseResult>;
+export declare const print_file: (options: PrintFileOptions) => Promise<ResponseResult>;
 /**
  * Get all jobs.
  * @returns A array of all printer jobs.

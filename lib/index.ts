@@ -1,7 +1,7 @@
 import { invoke } from '@tauri-apps/api/tauri'
 import { jobStatus } from './constants'
 import { Buffer } from 'buffer'
-import { Jobs, PrintOptions, PrintSettings, Printer, ResponseResult } from './interface'
+import { Jobs, PrintFileOptions, PrintOptions, PrintSettings, Printer, ResponseResult } from './types'
 import { PrintData } from './types'
 import { ResponseType, getClient } from '@tauri-apps/api/http';
 import mime from "mime";
@@ -97,11 +97,11 @@ export const printers = async (id: string|null = null): Promise<Printer[]> => {
 
 /**
  * Print.
- * @params first_param: File Path, second_param: Print Setting
+ * @params first_param:dataprint, second_param: Print Options
  * @returns A process status.
  */
 // export const print = async (data: PrintData, options: PrintOptions) => {
-export const print = async (data: PrintData[], options: PrintOptions) => {
+export const print = async (data: PrintData[], options: PrintOptions): Promise<ResponseResult> => {
     const html = document.createElement('html')
     const container = document.createElement("div")
     container.id = "wrapper"
@@ -174,6 +174,51 @@ export const print = async (data: PrintData[], options: PrintOptions) => {
             }
 
             container.appendChild(textWrapper)
+        }
+
+        if (item.type == 'table'){
+            const tableWrapper = document.createElement('div')
+            tableWrapper.style.width = "100%"
+            const table = document.createElement('table')
+            const tableHead = document.createElement('thead')
+            const trHead = document.createElement('tr')
+            tableHead.appendChild(trHead)
+            
+            if (item.tableHeader){
+                for (const head of item.tableHeader){
+                    const tdHead = document.createElement('td')
+                    tdHead.innerText = head.toString()
+                    trHead.appendChild(tdHead)
+                }
+            }
+            
+            table.appendChild(tableHead)
+            const tableBody = document.createElement('tbody')
+            
+            if (item.tableBody){
+                for (const tr of item.tableBody){
+                    const trBody = document.createElement('tr')
+                    for (const td of tr){
+                        const tdBody = document.createElement('td')
+                        tdBody.innerText = td.toString()
+                        trBody.appendChild(tdBody)
+                    }
+
+                    tableBody.appendChild(trBody)
+                }
+            }
+            table.appendChild(tableBody)
+            
+            if (item.style){
+                const styles = item.style as any
+                for (const style of Object.keys(styles)){
+                    const key = style as any
+                    table.style[key] = styles[key]
+                }
+            }
+
+            tableWrapper.appendChild(table)
+            container.appendChild(tableWrapper)
         }
         
         if (item.type == 'qrCode'){
@@ -260,19 +305,25 @@ export const print = async (data: PrintData[], options: PrintOptions) => {
     hidder.appendChild(container)
     document.body.appendChild(hidder)
     const wrapper: any = document.querySelector('#wrapper')
-    const webview = new WebviewWindow(Date.now().toString(), {
-        url: `data:text/html,${htmlData}`,
-        title: "Print Preview",
-        width: wrapper.clientWidth,
-        height: wrapper.clientHeight,
-        // visible: false
-    })
-    webview.once('tauri://created', function () {
-    // webview window successfully created
-    })
-    webview.once('tauri://error', function (e) {
-        console.log(e)
-    })
+    if (options.preview){
+        const webview = new WebviewWindow(Date.now().toString(), {
+            url: `data:text/html,${htmlData}`,
+            title: "Print Preview",
+            width: wrapper.clientWidth,
+            height: wrapper.clientHeight,
+            // visible: false
+        })
+        webview.once('tauri://created', function () {
+        // webview window successfully created
+        })
+        webview.once('tauri://error', function (e) {
+            console.log(e)
+        })
+        return {
+            success: true,
+            message: "OK"
+        }
+    }
     const componentWidth = wrapper.clientWidth;
     const componentHeight = wrapper.clientHeight;
 
@@ -294,10 +345,11 @@ export const print = async (data: PrintData[], options: PrintOptions) => {
     const buffer = pdf.output('arraybuffer')
     wrapper.remove()
 
-    let id: string | undefined = "";
+    let id: string = "";
     if (typeof options.id != 'undefined'){
         id = decodeBase64(options.id);
-    } else {
+    } 
+    if (typeof options.name != 'undefined'){
         id = options.name
     }
     // 
@@ -306,15 +358,30 @@ export const print = async (data: PrintData[], options: PrintOptions) => {
         method: 'simplex',
         scale: 'noscale',
         orientation: 'portrait',
-        repeat: 1
+        repeat: 1,
+        color_type: "color"
     }
     if (typeof options?.print_setting?.paper != "undefined") printerSettings.paper = options.print_setting.paper;
     if (typeof options?.print_setting?.method != "undefined") printerSettings.method = options.print_setting.method;
     if (typeof options?.print_setting?.scale != "undefined") printerSettings.scale = options.print_setting.scale;
     if (typeof options?.print_setting?.orientation != "undefined") printerSettings.orientation = options.print_setting.orientation;
     if (typeof options?.print_setting?.repeat != "undefined") printerSettings.repeat = options.print_setting.repeat;
+    if (typeof options?.print_setting?.color_type != "undefined") printerSettings.color_type = options.print_setting.color_type;
+    if (typeof options?.print_setting?.range != "undefined") printerSettings.range = options.print_setting.range;
     
-    const printerSettingStr = `-print-settings ${printerSettings.paper},${printerSettings.method},${printerSettings.scale},${printerSettings.orientation},${printerSettings.repeat}x` 
+    let rangeStr = ""
+    if (printerSettings.range){
+        if (typeof printerSettings.range == 'string'){
+            if (!(new RegExp(/^[0-9,]+$/).test(printerSettings.range))) throw new Error('Invalid range value ')
+            rangeStr = printerSettings.range[printerSettings.range.length-1] != "," ? printerSettings.range : printerSettings.range.substring(0, printerSettings.range.length-1)     
+        }
+        else
+        if (printerSettings.range.from){
+            rangeStr = `${printerSettings.range.from}-${printerSettings.range.to}`
+        }
+    }
+    
+    const printerSettingStr = `-print-settings ${rangeStr},${printerSettings.paper},${printerSettings.method},${printerSettings.scale},${printerSettings.orientation},${printerSettings.color_type},${printerSettings.repeat}x` 
 
     const filename: string = `${Math.floor(Math.random() * 100000000)}_${Date.now()}.pdf`;
     const tempPath: string = await invoke('plugin:printer|create_temp_file', {
@@ -328,13 +395,9 @@ export const print = async (data: PrintData[], options: PrintOptions) => {
         id: `"${id}"`,
         path: tempPath,
         printer_setting: printerSettingStr,
-        remove_after_print: options.remove_temp ? options.remove_temp : true
+        remove_after_print: typeof options.remove_temp != undefined ? options.remove_temp : true
     }
 
-    if (typeof options.file != "undefined"){
-        optionsParams.path = tempPath
-    }
-    
     await invoke('plugin:printer|print_pdf', optionsParams)
     return {
         success: true,
@@ -347,7 +410,7 @@ export const print = async (data: PrintData[], options: PrintOptions) => {
  * @params first_param: File Path, second_param: Print Setting
  * @returns A process status.
  */
-export const print_file = async (options: PrintOptions): Promise<ResponseResult> => {
+export const print_file = async (options: PrintFileOptions): Promise<ResponseResult> => {
     if (options.id == undefined && options.name == undefined) throw new Error('print_file require id | name as string') 
     if (options.path == undefined && options.file == undefined) throw new Error('print_file require parameter path as string | file as Buffer')   
     let id: string | undefined = "";
@@ -370,6 +433,7 @@ export const print_file = async (options: PrintOptions): Promise<ResponseResult>
     if (typeof options?.print_setting?.scale != "undefined") printerSettings.scale = options.print_setting.scale;
     if (typeof options?.print_setting?.orientation != "undefined") printerSettings.orientation = options.print_setting.orientation;
     if (typeof options?.print_setting?.repeat != "undefined") printerSettings.repeat = options.print_setting.repeat;
+    if (typeof options?.print_setting?.range != "undefined") printerSettings.range = options.print_setting.range;
     if (typeof options.path != "undefined"){
         if (options.path.split('.').length <= 1) throw new Error('File not supported');
         if (options.path.split('.').pop() != 'pdf' ) throw new Error('File not supported');

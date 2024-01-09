@@ -97,96 +97,11 @@ const printers = async (id = null) => {
 exports.printers = printers;
 /**
  * Print.
- * @params first_param: File Path, second_param: Print Setting
+ * @params first_param:dataprint, second_param: Print Options
  * @returns A process status.
  */
 // export const print = async (data: PrintData, options: PrintOptions) => {
 const print = async (data, options) => {
-    const dataTest = [
-        {
-            type: 'image',
-            url: 'https://randomuser.me/api/portraits/men/43.jpg',
-            position: 'center',
-            width: 60,
-            height: 160,
-            style: {
-                objectFit: 'contain'
-            } // width of image in px; default: 50 or '50px'
-        },
-        {
-            type: 'text',
-            value: 'SAMPLE HEAawdawdDING',
-            style: { fontWeight: "700", textAlign: 'center', fontSize: "24px" }
-        },
-        {
-            type: 'text',
-            value: 'SAMPLE HEAawdawdDING',
-            style: { fontWeight: "700", textAlign: 'center', fontSize: "24px" }
-        },
-        {
-            type: 'text',
-            value: 'SAMPLE HEAawdawdDING',
-            style: { fontWeight: "700", textAlign: 'center', fontSize: "24px" }
-        },
-        {
-            type: 'text',
-            value: 'SAMPLE HEAawdawdDING',
-            style: { fontWeight: "700", textAlign: 'center', fontSize: "24px" }
-        },
-        {
-            type: 'text',
-            value: 'SAMPLE HEAawdawdDING',
-            style: { fontWeight: "700", textAlign: 'center', fontSize: "24px" }
-        },
-        {
-            type: 'text',
-            value: 'SAMPLE HEAawdawdDING',
-            style: { fontWeight: "700", textAlign: 'center', fontSize: "24px" }
-        },
-        {
-            type: 'text',
-            value: 'SAMPLE HEAawdawdDING',
-            style: { fontWeight: "700", textAlign: 'center', fontSize: "24px" }
-        },
-        {
-            type: 'text',
-            value: 'SAMPLE HEAawdawdDING',
-            style: { fontWeight: "700", textAlign: 'center', fontSize: "24px" }
-        },
-        {
-            type: 'text',
-            value: 'SAMPLE HEAawdawdDING',
-            style: { fontWeight: "700", textAlign: 'center', fontSize: "24px" }
-        },
-        {
-            type: 'text',
-            value: 'SAMPLE HEAawdawdDING',
-            style: { fontWeight: "700", textAlign: 'center', fontSize: "24px" }
-        },
-        {
-            type: 'text',
-            value: 'SAMPLE HEAawdawdDING',
-            style: { fontWeight: "700", textAlign: 'center', fontSize: "24px" }
-        },
-        {
-            type: 'text',
-            value: 'Secondary text',
-            style: { textDecoration: "underline", fontSize: "10px", textAlign: "center", color: "red" }
-        }, {
-            type: 'barCode',
-            value: '023456789010',
-            height: 40,
-            displayValue: true,
-            fontsize: 12,
-        }, {
-            type: 'qrCode',
-            value: 'https://github.com/Hubertformin/electron-pos-printer',
-            height: 100,
-            width: 100,
-            position: 'center',
-            style: { margin: '10 20px 20 20px' }
-        }
-    ];
     const html = document.createElement('html');
     const container = document.createElement("div");
     container.id = "wrapper";
@@ -201,7 +116,7 @@ const print = async (data, options) => {
     container.style.height = "fit-content";
     container.style.color = "#000";
     container.style.fontSize = '12px';
-    for (const item of dataTest) {
+    for (const item of data) {
         if (item.type == 'image') {
             const wrapperImage = document.createElement('div');
             wrapperImage.style.width = "100%";
@@ -249,6 +164,44 @@ const print = async (data, options) => {
                 }
             }
             container.appendChild(textWrapper);
+        }
+        if (item.type == 'table') {
+            const tableWrapper = document.createElement('div');
+            tableWrapper.style.width = "100%";
+            const table = document.createElement('table');
+            const tableHead = document.createElement('thead');
+            const trHead = document.createElement('tr');
+            tableHead.appendChild(trHead);
+            if (item.tableHeader) {
+                for (const head of item.tableHeader) {
+                    const tdHead = document.createElement('td');
+                    tdHead.innerText = head.toString();
+                    trHead.appendChild(tdHead);
+                }
+            }
+            table.appendChild(tableHead);
+            const tableBody = document.createElement('tbody');
+            if (item.tableBody) {
+                for (const tr of item.tableBody) {
+                    const trBody = document.createElement('tr');
+                    for (const td of tr) {
+                        const tdBody = document.createElement('td');
+                        tdBody.innerText = td.toString();
+                        trBody.appendChild(tdBody);
+                    }
+                    tableBody.appendChild(trBody);
+                }
+            }
+            table.appendChild(tableBody);
+            if (item.style) {
+                const styles = item.style;
+                for (const style of Object.keys(styles)) {
+                    const key = style;
+                    table.style[key] = styles[key];
+                }
+            }
+            tableWrapper.appendChild(table);
+            container.appendChild(tableWrapper);
         }
         if (item.type == 'qrCode') {
             const wrapperImage = document.createElement('div');
@@ -323,19 +276,25 @@ const print = async (data, options) => {
     hidder.appendChild(container);
     document.body.appendChild(hidder);
     const wrapper = document.querySelector('#wrapper');
-    const webview = new window_1.WebviewWindow(Date.now().toString(), {
-        url: `data:text/html,${htmlData}`,
-        title: "Print Preview",
-        width: wrapper.clientWidth,
-        height: wrapper.clientHeight,
-        // visible: false
-    });
-    webview.once('tauri://created', function () {
-        // webview window successfully created
-    });
-    webview.once('tauri://error', function (e) {
-        console.log(e);
-    });
+    if (options.preview) {
+        const webview = new window_1.WebviewWindow(Date.now().toString(), {
+            url: `data:text/html,${htmlData}`,
+            title: "Print Preview",
+            width: wrapper.clientWidth,
+            height: wrapper.clientHeight,
+            // visible: false
+        });
+        webview.once('tauri://created', function () {
+            // webview window successfully created
+        });
+        webview.once('tauri://error', function (e) {
+            console.log(e);
+        });
+        return {
+            success: true,
+            message: "OK"
+        };
+    }
     const componentWidth = wrapper.clientWidth;
     const componentHeight = wrapper.clientHeight;
     const ratio = componentHeight / componentWidth;
@@ -356,7 +315,7 @@ const print = async (data, options) => {
     if (typeof options.id != 'undefined') {
         id = decodeBase64(options.id);
     }
-    else {
+    if (typeof options.name != 'undefined') {
         id = options.name;
     }
     // 
@@ -365,7 +324,8 @@ const print = async (data, options) => {
         method: 'simplex',
         scale: 'noscale',
         orientation: 'portrait',
-        repeat: 1
+        repeat: 1,
+        color_type: "color"
     };
     if (typeof options?.print_setting?.paper != "undefined")
         printerSettings.paper = options.print_setting.paper;
@@ -377,7 +337,22 @@ const print = async (data, options) => {
         printerSettings.orientation = options.print_setting.orientation;
     if (typeof options?.print_setting?.repeat != "undefined")
         printerSettings.repeat = options.print_setting.repeat;
-    const printerSettingStr = `-print-settings ${printerSettings.paper},${printerSettings.method},${printerSettings.scale},${printerSettings.orientation},${printerSettings.repeat}x`;
+    if (typeof options?.print_setting?.color_type != "undefined")
+        printerSettings.color_type = options.print_setting.color_type;
+    if (typeof options?.print_setting?.range != "undefined")
+        printerSettings.range = options.print_setting.range;
+    let rangeStr = "";
+    if (printerSettings.range) {
+        if (typeof printerSettings.range == 'string') {
+            if (!(new RegExp(/^[0-9,]+$/).test(printerSettings.range)))
+                throw new Error('Invalid range value ');
+            rangeStr = printerSettings.range[printerSettings.range.length - 1] != "," ? printerSettings.range : printerSettings.range.substring(0, printerSettings.range.length - 1);
+        }
+        else if (printerSettings.range.from) {
+            rangeStr = `${printerSettings.range.from}-${printerSettings.range.to}`;
+        }
+    }
+    const printerSettingStr = `-print-settings ${rangeStr},${printerSettings.paper},${printerSettings.method},${printerSettings.scale},${printerSettings.orientation},${printerSettings.color_type},${printerSettings.repeat}x`;
     const filename = `${Math.floor(Math.random() * 100000000)}_${Date.now()}.pdf`;
     const tempPath = await (0, tauri_1.invoke)('plugin:printer|create_temp_file', {
         buffer_data: buffer_1.Buffer.from(buffer).toString('base64'),
@@ -389,11 +364,8 @@ const print = async (data, options) => {
         id: `"${id}"`,
         path: tempPath,
         printer_setting: printerSettingStr,
-        remove_after_print: options.remove_temp ? options.remove_temp : true
+        remove_after_print: typeof options.remove_temp != undefined ? options.remove_temp : true
     };
-    if (typeof options.file != "undefined") {
-        optionsParams.path = tempPath;
-    }
     await (0, tauri_1.invoke)('plugin:printer|print_pdf', optionsParams);
     return {
         success: true,
@@ -435,6 +407,8 @@ const print_file = async (options) => {
         printerSettings.orientation = options.print_setting.orientation;
     if (typeof options?.print_setting?.repeat != "undefined")
         printerSettings.repeat = options.print_setting.repeat;
+    if (typeof options?.print_setting?.range != "undefined")
+        printerSettings.range = options.print_setting.range;
     if (typeof options.path != "undefined") {
         if (options.path.split('.').length <= 1)
             throw new Error('File not supported');

@@ -305,16 +305,12 @@ export const print = async (data: PrintData[], options: PrintOptions): Promise<R
     hidder.appendChild(container)
     document.body.appendChild(hidder)
     const wrapper: any = document.querySelector('#wrapper')
-    if (options.preview){
+    if (options.preview == true){
         const webview = new WebviewWindow(Date.now().toString(), {
             url: `data:text/html,${htmlData}`,
             title: "Print Preview",
             width: wrapper.clientWidth,
             height: wrapper.clientHeight,
-            // visible: false
-        })
-        webview.once('tauri://created', function () {
-        // webview window successfully created
         })
         webview.once('tauri://error', function (e) {
             console.log(e)

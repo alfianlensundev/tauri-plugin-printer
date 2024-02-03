@@ -1,6 +1,6 @@
 {
   "name": "tauri-plugin-printer",
-  "version": "1.0.11",
+  "version": "1.0.12",
   "description": "Tauri Plugin for printer access",
   "main": "dist/lib/index.js",
   "types": "dist/lib/index.d.ts",

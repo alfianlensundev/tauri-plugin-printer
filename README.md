@@ -136,6 +136,7 @@ const data = [
 ]
 // print pdf file
 await print(data, {
+    id: "idprinter"  // id printer get from printers()
     preview: true, // Set to true if you want to display the preview
     page_size: {
         width: 300, // unit px

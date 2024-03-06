@@ -466,7 +466,7 @@ export const print_file = async (options: PrintFileOptions): Promise<ResponseRes
         id: `"${id}"`,
         path: options.path, 
         printer_setting: printerSettingStr,
-        remove_after_print: options.remove_temp ? options.remove_temp : true
+        remove_after_print: typeof options.remove_temp != undefined ? options.remove_temp : true
     }
 
     if (typeof options.file != "undefined"){

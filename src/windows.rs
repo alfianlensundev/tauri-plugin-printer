@@ -69,7 +69,7 @@ pub fn print_pdf (options: PrintOptions) -> String {
     let dir: std::path::PathBuf = env::temp_dir();
     let print_setting: String = options.print_setting;
     let mut print: String = "-print-to-default".to_owned();
-    if options.id.len() == 0 {
+    if options.id.len() != 0 {
         print = format!("-print-to {}", options.id).to_owned();
     }
     let shell_command = format!("{}sm.exe {} {} -silent {}", dir.display(), print, print_setting, options.path);

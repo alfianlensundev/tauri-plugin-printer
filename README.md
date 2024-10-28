@@ -136,12 +136,12 @@ const data = [
 ]
 // print pdf file
 await print(data, {
-    id: "idprinter"  // id printer get from printers()
+    id: "idprinter",  // id printer get from printers()
     preview: true, // Set to true if you want to display the preview
     page_size: {
         width: 300, // unit px
-        heigth: 400 // unit px
-    };
+        height: 400 // unit px
+    },
     print_setting: {
         orientation: "landscape",
         method: "simplex", // duplex | simplex | duplexshort

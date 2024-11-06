@@ -1,9 +1,14 @@
 {
-    "compilerOptions": {
-        "target": "ES2022",
-        "module": "commonjs",
-        "declaration": true,
-        "outDir": "./dist",
-        "strict": true
-    }
+  "compilerOptions": {
+    "target": "es2021",
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "skipLibCheck": true,
+    "strict": true,
+    "noUnusedLocals": true,
+    "noImplicitAny": true,
+    "noEmit": true
+  },
+  "include": ["guest-js/*.ts"],
+  "exclude": ["dist-js", "node_modules"]
 }

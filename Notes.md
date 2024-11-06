@@ -1,5 +1,5 @@
 
-## JobStatus
+## Windows JobStatus
 
 Blocked	512	
 An error condition, possibly on a print job that precedes this one in the queue, blocked the print job.

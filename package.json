@@ -1,37 +1,33 @@
 {
   "name": "tauri-plugin-printer",
-  "version": "1.0.12",
-  "description": "Tauri Plugin for printer access",
-  "main": "dist/lib/index.js",
-  "types": "dist/lib/index.d.ts",
-  "readme": "README.md",
-  "repository": "https://github.com/alfianlensundev/tauri-plugin-printer.git",
-  "author": "alfianlensun <alfianlensundev@gmail.com>",
-  "license": "MIT",
-  "keywords": [
-    "tauri",
-    "printer"
-  ],
+  "version": "0.1.0",
+  "author": "You",
+  "description": "",
+  "type": "module",
+  "types": "./dist-js/index.d.ts",
+  "main": "./dist-js/index.cjs",
+  "module": "./dist-js/index.js",
+  "exports": {
+    "types": "./dist-js/index.d.ts",
+    "import": "./dist-js/index.js",
+    "require": "./dist-js/index.cjs"
+  },
   "files": [
-    "dist/**/*"
+    "dist-js",
+    "README.md"
   ],
   "scripts": {
-    "build": "tsc -b --force",
-    "test": "jest test/"
-  },
-  "devDependencies": {
-    "@tauri-apps/api": "^1.3.0",
-    "@types/jsbarcode": "^3.11.4",
-    "@types/qrcode": "^1.5.5",
-    "jest": "^29.5.0",
-    "typescript": "^5.0.4"
+    "build": "rollup -c",
+    "prepublishOnly": "pnpm build",
+    "pretest": "pnpm build"
   },
   "dependencies": {
-    "buffer": "^6.0.3",
-    "html2canvas": "^1.4.1",
-    "jsbarcode": "^3.11.6",
-    "jspdf": "^2.5.1",
-    "mime": "^4.0.1",
-    "qrcode": "^1.5.3"
+    "@tauri-apps/api": ">=2.0.0-beta.6"
+  },
+  "devDependencies": {
+    "@rollup/plugin-typescript": "^11.1.6",
+    "rollup": "^4.9.6",
+    "typescript": "^5.3.3",
+    "tslib": "^2.6.2"
   }
 }

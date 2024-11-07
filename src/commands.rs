@@ -1,9 +1,7 @@
-use tauri::{AppHandle, command, Runtime};
 
-use crate::desktopapp::dto::PrinterItem;
-use crate::models::*;
-use crate::Result;
-use crate::PrinterExt;
+
+use tauri::{AppHandle, command, Runtime};
+use crate::{PrinterExt, PrinterItem, Result};
 
 #[command]
 pub(crate) async fn get_printers<R: Runtime>(

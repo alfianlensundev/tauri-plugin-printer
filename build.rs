@@ -1,8 +1,6 @@
-const COMMANDS: &[&str] = &["ping"];
+const COMMANDS: &[&str] = &["get_printers"];
 
 fn main() {
   tauri_plugin::Builder::new(COMMANDS)
-    .android_path("android")
-    .ios_path("ios")
     .build();
 }

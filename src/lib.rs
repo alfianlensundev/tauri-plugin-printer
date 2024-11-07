@@ -34,7 +34,7 @@ impl<R: Runtime, T: Manager<R>> crate::PrinterExt<R> for T {
 /// Initializes the plugin.
 pub fn init<R: Runtime>() -> TauriPlugin<R> {
   Builder::new("printer")
-    .invoke_handler(tauri::generate_handler![commands::ping])
+    .invoke_handler(tauri::generate_handler![commands::get_printers])
     .setup(|app, api| {
       #[cfg(desktop)]
       let rt = tokio::runtime::Runtime::new().expect("Failed to create Tokio runtime");

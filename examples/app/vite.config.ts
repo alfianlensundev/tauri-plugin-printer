@@ -14,7 +14,7 @@ export default defineConfig(async () => ({
   // 1. prevent vite from obscuring rust errors
   resolve: {
     alias: {
-      'tauri-plugin-printer': path.resolve(__dirname, '../../tauri-plugin-printer')
+      'tauri-plugin-printer': path.resolve(__dirname, '../../../tauri-plugin-printer')
     }
   },
   clearScreen: false,

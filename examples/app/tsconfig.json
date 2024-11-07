@@ -15,7 +15,7 @@
     "jsx": "react-jsx",
     "baseUrl": ".",
     "paths": {
-      "tauri-plugin-printer": ["../../tauri-plugin-printer"]
+      "tauri-plugin-printer": ["../../../tauri-plugin-printer"]
     },
 
     /* Linting */

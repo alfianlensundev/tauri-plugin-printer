@@ -295,14 +295,14 @@
       "type": "string",
       "oneOf": [
         {
-          "description": "Enables the ping command without any pre-configured scope.",
+          "description": "Enables the get_printers command without any pre-configured scope.",
           "type": "string",
-          "const": "allow-ping"
+          "const": "allow-get-printers"
         },
         {
-          "description": "Denies the ping command without any pre-configured scope.",
+          "description": "Denies the get_printers command without any pre-configured scope.",
           "type": "string",
-          "const": "deny-ping"
+          "const": "deny-get-printers"
         },
         {
           "description": "Default permissions for the plugin",

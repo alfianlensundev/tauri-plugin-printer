@@ -1,6 +1,7 @@
 use std::{env, fs::File, io::Write, process::Command};
 
 use crate::PrinterItem;
+use base64::{Engine as _, engine::general_purpose};
 
 
 pub async fn init() -> Result<bool, crate::Error>{
@@ -19,14 +20,14 @@ pub async fn get_printers() -> Result<Vec<crate::models::PrinterItem>, crate::Er
     let printers: Vec<crate::models::PrinterRaw> = serde_json::from_str(&output_str).expect("Failed to parse printer data to JSON");
 
     let mut response_item = Vec::new();
-
     for printer in printers {
+        let name: String = printer.name.unwrap_or("".to_owned());
         response_item.push(PrinterItem{
-            id: "".to_owned(),
+            id: general_purpose::STANDARD.encode(&name),
             computer_name: printer.computer_name,
             driver_name: printer.driver_name,
             job_count: printer.job_count,
-            name: printer.name.unwrap(),
+            name,
             port_name: printer.port_name,
             print_processor: printer.print_processor,
             printer_status: printer.printer_status,

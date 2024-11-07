@@ -2,7 +2,7 @@
 
 Default permissions for the plugin
 
-- `allow-ping`
+- `allow-get-printers`
 
 ## Permission Table
 

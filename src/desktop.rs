@@ -1,7 +1,9 @@
-use serde::de::DeserializeOwned;
-use tauri::{plugin::PluginApi, AppHandle, Manager, Runtime};
+use std::collections::vec_deque;
 
-use crate::{desktopapp, PingRequest, PingResponse};
+use serde::de::DeserializeOwned;
+use tauri::{plugin::PluginApi, AppHandle, Runtime};
+
+use crate::{desktopapp::{self, dto::PrinterItem}, PingRequest, PingResponse};
 
 
 pub async fn init<R: Runtime, C: DeserializeOwned>(
@@ -16,8 +18,6 @@ pub async fn init<R: Runtime, C: DeserializeOwned>(
         Err(_) => print!("Fail to load windows lib"),
     };
   }
-  
-  println!("{}", os == "macos");
   if os == "macos" {
     match desktopapp::macos::init().await {
       Ok(_) => print!("Success load macos lib"),
@@ -32,9 +32,18 @@ pub async fn init<R: Runtime, C: DeserializeOwned>(
 pub struct Printer<R: Runtime>(AppHandle<R>);
 
 impl<R: Runtime> Printer<R> {
-  pub fn ping(&self, payload: PingRequest) -> crate::Result<PingResponse> {
-    Ok(PingResponse {
-      value: payload.value,
-    })
+  pub async fn get_printers(&self) -> crate::Result<Vec<PrinterItem>> {
+    let os: String = std::env::consts::OS.to_string();
+    // if os == "windows" {
+    //   match desktopapp::windows::init().await {
+    //       Ok(_) => print!("Success load windows lib"),
+    //       Err(_) => print!("Fail to load windows lib"),
+    //   };
+    // }
+    if os == "macos" {
+      let printers = desktopapp::macos::get_printers().await.unwrap();
+      return Ok(printers)
+    }
+    Ok(vec![])
   }
 }

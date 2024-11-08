@@ -27,6 +27,7 @@ repository = "https://github.com/alfianlensundev/tauri-plugin-printer"
 [dependencies]
 tauri = { version = "2.0.6" }
 serde = "1.0"
+sysinfo = "0.32.0"
 serde_json = "1.0.128"
 serde_with = "3.11.0"
 base64 = "0.21.2"

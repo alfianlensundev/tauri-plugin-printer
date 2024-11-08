@@ -2,6 +2,7 @@ use std::{env, fs::File, io::Write, process::Command};
 
 use crate::PrinterItem;
 use base64::{Engine as _, engine::general_purpose};
+use sysinfo::System;
 
 
 pub async fn init() -> Result<bool, crate::Error>{
@@ -22,7 +23,7 @@ pub async fn get_printers() -> Result<Vec<crate::models::PrinterItem>, crate::Er
     let mut response_item = Vec::new();
     for printer in printers {
         let name: String = printer.name.unwrap_or("".to_owned());
-        response_item.push(PrinterItem{
+        let mut printer_data = PrinterItem{
             id: general_purpose::STANDARD.encode(&name),
             computer_name: printer.computer_name,
             driver_name: printer.driver_name,
@@ -35,8 +36,46 @@ pub async fn get_printers() -> Result<Vec<crate::models::PrinterItem>, crate::Er
             priority: printer.priority,
             share_name: printer.share_name,
             shared: printer.shared.unwrap_or(false),
-        });
+        };
+
+        if printer.shared.unwrap() == false {
+            printer_data.computer_name = System::host_name();
+        }
+        
+        response_item.push(printer_data);
     }
     
     Ok(response_item)
+}
+
+
+pub async fn get_printer(id: String) -> Result<crate::models::PrinterItem, crate::Error>{
+    let findnamebuf = general_purpose::STANDARD.decode(id).expect("The printer ID does not match");
+    let findname = String::from_utf8(findnamebuf).expect("The printer ID does not match");
+
+    let output = Command::new("powershell").args([format!("Get-Printer -Name \"{}\" | Select-Object Name, DriverName, JobCount, PrintProcessor, PortName, ShareName, ComputerName, PrinterStatus, Shared, Type, Priority | ConvertTo-Json", findname)]).output().expect("Failed to execute PowerShell command");
+    let output_str = String::from_utf8_lossy(&output.stdout);
+
+    let printer: crate::models::PrinterRaw = serde_json::from_str(&output_str).expect("Failed to parse printer data to JSON");
+    
+    let name: String = printer.name.unwrap_or("".to_owned());
+    let mut printer_data = PrinterItem{
+        id: general_purpose::STANDARD.encode(&name),
+        computer_name: printer.computer_name,
+        driver_name: printer.driver_name,
+        job_count: printer.job_count,
+        name,
+        port_name: printer.port_name,
+        print_processor: printer.print_processor,
+        printer_status: printer.printer_status,
+        printer_type: printer.printer_type,
+        priority: printer.priority,
+        share_name: printer.share_name,
+        shared: printer.shared.unwrap_or(false),
+    };
+
+    if printer.shared.unwrap() == false {
+        printer_data.computer_name = System::host_name();
+    }
+    Ok(printer_data)
 }

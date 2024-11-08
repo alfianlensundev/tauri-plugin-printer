@@ -5,7 +5,7 @@
   "windows": ["main"],
   "permissions": [
     "printer:default",
-    "printer:allow-get-printers",
+    "printer:allow-get-printer",
     "core:default",
     "shell:allow-open"
   ]

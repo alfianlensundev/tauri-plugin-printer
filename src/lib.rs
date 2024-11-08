@@ -16,8 +16,6 @@ pub use error::{Error, Result};
 
 #[cfg(desktop)]
 use desktop::Printer;
-#[cfg(mobile)]
-use mobile::Printer;
 
 /// Extensions to [`tauri::App`], [`tauri::AppHandle`] and [`tauri::Window`] to access the printer APIs.
 pub trait PrinterExt<R: Runtime> {
@@ -34,7 +32,7 @@ impl<R: Runtime, T: Manager<R>> crate::PrinterExt<R> for T {
 /// Initializes the plugin.
 pub fn init<R: Runtime>() -> TauriPlugin<R> {
   Builder::new("printer")
-    .invoke_handler(tauri::generate_handler![commands::get_printers])
+    .invoke_handler(tauri::generate_handler![commands::get_printers, commands::get_printer])
     .setup(|app, api| {
       #[cfg(desktop)]
       let rt = tokio::runtime::Runtime::new().expect("Failed to create Tokio runtime");

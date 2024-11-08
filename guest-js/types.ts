@@ -12,3 +12,11 @@ export type Printer = {
     printer_type: number;
     priority: number
 }
+
+export type ResponseSuccess<T> = {
+    data: T
+}
+
+export type ResponseError= {
+    error: string
+}

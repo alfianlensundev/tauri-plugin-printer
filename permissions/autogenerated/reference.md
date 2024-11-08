@@ -16,6 +16,32 @@ Default permissions for the plugin
 <tr>
 <td>
 
+`printer:allow-get-printer`
+
+</td>
+<td>
+
+Enables the get_printer command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`printer:deny-get-printer`
+
+</td>
+<td>
+
+Denies the get_printer command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
 `printer:allow-get-printers`
 
 </td>

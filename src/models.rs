@@ -1,15 +1,26 @@
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Deserialize, Serialize)]
-#[serde(rename_all = "camelCase")]
-pub struct PingRequest {
-  pub value: Option<String>,
+#[derive(Debug, Clone, Default, Deserialize, Serialize)]
+pub struct ResponseError {
+    pub error: String
 }
 
+
 #[derive(Debug, Clone, Default, Deserialize, Serialize)]
-#[serde(rename_all = "camelCase")]
-pub struct PingResponse {
-  pub value: Option<String>,
+pub struct ResponseOk<T> {
+    pub data: T
+}
+
+
+#[derive(Debug, Clone, Deserialize, Serialize)]
+pub enum ResponseResult<T> {
+    Success(ResponseOk<T>),
+    Error(ResponseError)
+}
+
+#[derive(Debug, Clone, Deserialize, Serialize)]
+pub struct RequestPayload<T> {
+    pub value: T
 }
 
 

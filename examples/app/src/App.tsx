@@ -1,6 +1,6 @@
 import { useState } from "react";
 import reactLogo from "./assets/react.svg";
-import {get_printers} from 'tauri-plugin-printer'
+import {get_printer, get_printers} from 'tauri-plugin-printer'
 import "./App.css";
 
 function App() {

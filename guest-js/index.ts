@@ -38,3 +38,24 @@ export async function get_printer(id: string): Promise<Printer> {
     if (result.Error) throw new Error(result.Error.error)
     return result.Success.data as Printer
 }
+
+
+/**
+ * Print HTML
+ * @param id - Printer ID from get_printers function 
+ * @returns Json Result 
+ * 
+ * 
+ * @example
+ * 
+ * await print_html(htmldata)
+ */
+export async function print_html(html: string): Promise<Printer> {
+    const result: any = await invoke('plugin:printer|print_html', {
+        payload: {
+            // value: id
+        }
+    })
+    return result.Success.data as Printer
+}
+

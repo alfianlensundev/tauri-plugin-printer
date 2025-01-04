@@ -76,3 +76,11 @@ pub struct PrinterRaw {
     #[serde(rename = "Priority")]
     pub priority: Option<i32>,
 }
+
+
+pub struct PrintOptions {
+    pub printer_id: String,
+    pub document_path: String,
+    pub print_settings: String,
+    pub remove_after_print: bool
+}

@@ -22,7 +22,7 @@ export type ResponseError= {
 }
 
 
-export type SizeOptions {
+export type SizeOptions = {
     height: number;
     width: number;
 }

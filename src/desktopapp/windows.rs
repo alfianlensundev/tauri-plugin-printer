@@ -1,4 +1,4 @@
-use std::{env, fs::File, io::Write, process::Command};
+use std::{env, fs::File, io::Write, process::Command, vec};
 
 use crate::PrinterItem;
 use base64::{Engine as _, engine::general_purpose};
@@ -15,12 +15,23 @@ pub async fn init() -> Result<bool, crate::Error>{
 }
 
 pub async fn get_printers() -> Result<Vec<crate::models::PrinterItem>, crate::Error>{
-    let output = Command::new("powershell").args(["Get-Printer | Select-Object Name, DriverName, JobCount, PrintProcessor, PortName, ShareName, ComputerName, PrinterStatus, Shared, Type, Priority | ConvertTo-Json"]).output().expect("Failed to execute PowerShell command");
+    let output = Command::new("powershell")
+        .args(["Get-Printer | Select-Object Name, DriverName, JobCount, PrintProcessor, PortName, ShareName, ComputerName, PrinterStatus, Shared, Type, Priority | ConvertTo-Json"])
+        .output()
+        .expect("Failed to execute PowerShell command");
+    
     let output_str = String::from_utf8_lossy(&output.stdout);
 
-    let printers: Vec<crate::models::PrinterRaw> = serde_json::from_str(&output_str).expect("Failed to parse printer data to JSON");
+    let printers: Vec<crate::models::PrinterRaw> = match serde_json::from_str(&output_str) {
+        Ok(list_printer) => list_printer,
+        Err(_) => {
+            let single_printer: crate::models::PrinterRaw = serde_json::from_str(&output_str).expect("Failed to parse string");
+            vec![single_printer]
+        }
+    };
 
     let mut response_item = Vec::new();
+    
     for printer in printers {
         let name: String = printer.name.unwrap_or("".to_owned());
         let mut printer_data = PrinterItem{

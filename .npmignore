@@ -1,10 +1,13 @@
-src
-target
+bin
+guest-js
+permissions
 Cargo.toml
 Cargo.lock
+build.rs
 examples
 test
 node_modules
 tsconfig.json
 yarn.lock
 dist/target
+target

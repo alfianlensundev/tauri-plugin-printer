@@ -1,218 +1,170 @@
-# Tauri Plugin Printer
-Interface with printers through [Powershell](https://learn.microsoft.com/en-us/powershell/scripting/install/installing-powershell-on-windows?view=powershell-7.3)
+# Tauri Plugin Printer v2
 
+Printer discovery, PDF/HTML printing, printer configuration, and print-queue management for Tauri v2 on Windows.
 
-## Buy Me Coffee
-[PayPal](https://paypal.me/alfianlensun)
+> Version 2 is a clean Tauri v2 API. The old v1 functions (`printers`, `print`, `print_file`, `jobs`, and the snake_case job actions) are intentionally not exported.
 
-[BuyMeCoffee](https://www.buymeacoffee.com/alfianlensun)
+## Features
 
+- List printers and read one printer by its stable base64 id.
+- Read or change the Windows default printer.
+- Read color, collate, duplex, and paper configuration.
+- Print an existing PDF path or in-memory PDF bytes.
+- Render structured text, images, tables, QR codes, barcodes, or arbitrary HTML to PDF and print it.
+- List, inspect, pause, resume, restart, and remove spooler jobs.
+- Validate printer ids, job ids, PDF signatures, and command failures without panics.
+- Tauri v2 permissions separated into read, print, queue-management, and default-printer-management groups.
+
+Windows is currently the only supported platform. The bundled PDF renderer is SumatraPDF 3.4.6; see [Third-party software](#third-party-software).
 
 ## Install
-> If you are installing from npm and crate.io package registry, make sure the mayor and minor versions for both packages are the same, otherwise, the API may not match.
 
-Crate: https://crates.io/crates/tauri-plugin-printer
-
-Install latest version:
-
-`cargo add tauri-plugin-printer`
-
-Or add the following to your `Cargo.toml` for spesific version:
-
-`src-tauri/Cargo.toml`
-
-```toml
-[dependencies]
-tauri-plugin-printer = { version = "1.0.10" }
-```
-
-You can install the JavaScript Guest bindings using your preferred JavaScript package manager:
+Keep the Rust crate and JavaScript package on the same major and minor version.
 
 ```sh
-pnpm add tauri-plugin-printer
-# or
-npm add tauri-plugin-printer
-# or
-yarn add tauri-plugin-printer
+cargo add tauri-plugin-printer@2
+pnpm add tauri-plugin-printer@2
 ```
 
-## Usage
-
-First you need to register the core plugin with Tauri:
-
-`src-tauri/src/main.rs`
+Register the plugin:
 
 ```rust
 fn main() {
     tauri::Builder::default()
-        .plugin(tauri_plugin_printer::init())  
+        .plugin(tauri_plugin_printer::init())
         .run(tauri::generate_context!())
-        .expect("error while running tauri application");
+        .expect("error while running Tauri application");
 }
 ```
 
-Afterwards all the plugin's APIs are available through the JavaScript guest bindings:
+## Permissions
 
-```javascript
-import {printers, print, print_file, jobs, job, restart_job, pause_job, resume_job, remove_job} from "tauri-plugin-printer";
+Read-only commands are included in `printer:default`. Printing and mutations must be enabled explicitly in a capability:
 
-// get list printers
-const list = await printers()
-
-// get printer by id
-const list = await printers(id)
-
-
-const data = [
-    {
-        type: 'image',
-        url: 'https://randomuser.me/api/portraits/men/43.jpg',     // file path
-        position: 'center',                                  // position of image: 'left' | 'center' | 'right'
-        width: '160px',                                           // width of image in px; default: auto
-        height: '60px',                                          // width of image in px; default: 50 or '50px'
-    },{
-        type: 'text',                                       // 'text' | 'barCode' | 'qrCode' | 'image' | 'table
-        value: 'SAMPLE HEADING',
-        style: {fontWeight: "700", textAlign: 'center', fontSize: "24px"}
-    },{
-        type: 'text',                       // 'text' | 'barCode' | 'qrCode' | 'image' | 'table'
-        value: 'Secondary text',
-        style: {textDecoration: "underline", fontSize: "10px", textAlign: "center", color: "red"}
-    },{
-        type: 'barCode',
-        value: '023456789010',
-        height: 40,                     // height of barcode, applicable only to bar and QR codes
-        width: 2,                       // width of barcode, applicable only to bar and QR codes
-        displayValue: true,             // Display value below barcode
-        fontsize: 12,
-    },{
-        type: 'qrCode',
-        value: 'https://github.com/Hubertformin/electron-pos-printer',
-        height: 55,
-        width: 55,
-        style: { margin: '10 20px 20 20px' }
-    },{
-        type: 'table',
-        // style the table
-        style: {border: '1px solid #ddd'},
-        // list of the columns to be rendered in the table header
-        tableHeader: ['Animal', 'Age'],
-        // multi dimensional array depicting the rows and columns of the table body
-        tableBody: [
-            ['Cat', 2],
-            ['Dog', 4],
-            ['Horse', 12],
-            ['Pig', 4],
-        ],
-        // list of columns to be rendered in the table footer
-        tableFooter: ['Animal', 'Age'],
-        // custom style for the table header
-        tableHeaderStyle: { backgroundColor: '#000', color: 'white'},
-        // custom style for the table body
-        tableBodyStyle: {'border': '0.5px solid #ddd'},
-        // custom style for the table footer
-        tableFooterStyle: {backgroundColor: '#000', color: 'white'},
-    },{
-        type: 'table',
-        style: {border: '1px solid #ddd'},             // style the table
-        // list of the columns to be rendered in the table header
-        tableHeader: [{type: 'text', value: 'People'}, {type: 'image', path: path.join(__dirname, 'icons/animal.png')}],
-        // multi-dimensional array depicting the rows and columns of the table body
-        tableBody: [
-            [{type: 'text', value: 'Marcus'}, {type: 'image', url: 'https://randomuser.me/api/portraits/men/43.jpg'}],
-            [{type: 'text', value: 'Boris'}, {type: 'image', url: 'https://randomuser.me/api/portraits/men/41.jpg'}],
-            [{type: 'text', value: 'Andrew'}, {type: 'image', url: 'https://randomuser.me/api/portraits/men/23.jpg'}],
-            [{type: 'text', value: 'Tyresse'}, {type: 'image', url: 'https://randomuser.me/api/portraits/men/53.jpg'}],
-        ],
-        // list of columns to be rendered in the table footer
-        tableFooter: [{type: 'text', value: 'People'}, 'Image'],
-        // custom style for the table header
-        tableHeaderStyle: { backgroundColor: 'red', color: 'white'},
-        // custom style for the table body
-        tableBodyStyle: {'border': '0.5px solid #ddd'},
-        // custom style for the table footer
-        tableFooterStyle: {backgroundColor: '#000', color: 'white'},
-    },
-]
-// print pdf file
-await print(data, {
-    id: "idprinter"  // id printer get from printers()
-    preview: true, // Set to true if you want to display the preview
-    page_size: {
-        width: 300, // unit px
-        heigth: 400 // unit px
-    };
-    print_setting: {
-        orientation: "landscape",
-        method: "simplex", // duplex | simplex | duplexshort
-        paper: "A4", // "A2" | "A3" | "A4" | "A5" | "A6" | "letter" | "legal" | "tabloid"
-        scale: "noscale", //"noscale" | "shrink" | "fit"
-        repeat: 1, // total copies,
-        // range: "1,2,3"    // print page 1,2,3 
-        range: {        // print page 1 - 3
-            from: 1,
-            to: 3
-        }
-    }
-})
-
-// print pdf file
-await print_file({
-    id: "idfromlistprinter",
-    path: 'F:/path/to/file.pdf', 
-    file: BufferData,
-    print_setting: {
-        orientation: "landscape",
-        method: "simplex", // duplex | simplex | duplexshort
-        paper: "A4", // "A2" | "A3" | "A4" | "A5" | "A6" | "letter" | "legal" | "tabloid"
-        scale: "noscale", //"noscale" | "shrink" | "fit"
-        repeat: 1, // total copies
-        // range: "1,2,3"    // print page 1,2,3 
-        range: {        // print page 1 - 3
-            from: 1,
-            to: 3
-        }
-    }
-})
-
-// get all printer jobs
-await jobs()
-
-// get printer jobs by printer id 
-await jobs(idprinter)
-
-// get job by id
-await job(id)
-
-// restart all job
-await restart_job()
-
-// restart job by id
-await restart_job(id)
-
-// pause all job
-await pause_job()
-
-// pause job by id
-await pause_job(id)
-
-// resume all job 
-await resume_job()
-
-// resume job by id
-await resume_job(id)
-
-// remove all job
-await remove_job()
-
-// resume job by id
-await remove_job(id)
-
+```json
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "main",
+  "windows": ["main"],
+  "permissions": [
+    "core:default",
+    "printer:default",
+    "printer:printing",
+    "printer:job-management",
+    "printer:default-printer-management"
+  ]
+}
 ```
 
+Only grant the groups that the application actually uses.
 
+## Printer discovery and configuration
+
+```ts
+import {
+  getPrinters,
+  getPrinter,
+  getDefaultPrinter,
+  getPrinterCapabilities,
+  setDefaultPrinter,
+} from 'tauri-plugin-printer'
+
+const printers = await getPrinters()
+const printer = await getPrinter(printers[0].id)
+const currentDefault = await getDefaultPrinter()
+const capabilities = await getPrinterCapabilities(printer.id)
+
+await setDefaultPrinter(printer.id)
+// A name can be used explicitly too:
+await setDefaultPrinter({ name: 'Office Printer' })
+```
+
+`get_printers`, `get_printer`, and `print_html` remain available because those names were already part of the in-progress v2 branch. They are not v1 compatibility aliases.
+
+## Print a PDF
+
+Printer selection is optional. If neither `id` nor `name` is supplied, the Windows default printer is used.
+
+```ts
+import { printFile } from 'tauri-plugin-printer'
+
+await printFile({
+  id: printer.id,
+  path: 'C:\\documents\\invoice.pdf',
+  print_setting: {
+    paper: 'A4',
+    orientation: 'portrait',
+    method: 'simplex',
+    scale: 'fit',
+    color_type: 'monochrome',
+    repeat: 1,
+    range: { from: 1, to: 2 },
+  },
+})
+
+const response = await fetch('/invoice.pdf')
+await printFile({
+  file: await response.arrayBuffer(),
+  name: 'Office Printer',
+})
+```
+
+The plugin never deletes a PDF path supplied by the application. In-memory PDFs use a plugin-owned temporary file that is removed after the renderer exits.
+
+## Print HTML or structured receipt data
+
+```ts
+import { printData, printHtml } from 'tauri-plugin-printer'
+
+await printData(
+  [
+    { type: 'text', value: 'Receipt #1042', style: { fontSize: '20px', fontWeight: '700' } },
+    { type: 'qrCode', value: 'https://example.com/orders/1042', width: 96, height: 96 },
+    {
+      type: 'table',
+      tableHeader: ['Item', 'Total'],
+      tableBody: [['Coffee', '$4.00'], ['Cake', '$6.00']],
+      tableFooter: ['Grand total', '$10.00'],
+    },
+  ],
+  { id: printer.id, page_size: { width: 300, height: 500 } },
+)
+
+await printHtml('<h1>Shipping label</h1><p>Order #1042</p>', {
+  name: 'Label Printer',
+  page_size: { width: 400, height: 600 },
+})
+```
+
+Set `preview: true` to open a preview Webview instead of submitting a print job. Preview-window creation may require the corresponding Tauri core webview permission in the application.
+
+## Print queue
+
+```ts
+import { getJobs, getJob, pauseJob, resumeJob, restartJob, removeJob } from 'tauri-plugin-printer'
+
+const allJobs = await getJobs()
+const printerJobs = await getJobs(printer.id)
+const selected = await getJob(printerJobs[0].id)
+
+await pauseJob(selected.id)
+await resumeJob(selected.id)
+await restartJob(selected.id)
+await removeJob(selected.id)
+```
+
+Calling a job action without an id applies it to every currently visible print job.
+
+## Why PDF, and when not to use it
+
+PDF is the best general-purpose route for invoices, labels, reports, and documents because it preserves layout and delegates device-specific work to the Windows driver.
+
+For high-volume thermal/POS printers, RAW ESC/POS, ZPL, or CPCL is faster and produces sharper device-native text and barcodes. It is not included in this release because raw bytes are printer-language-specific and need a separate high-risk permission. A future `printRaw` API should target the Windows spooler directly and require the caller to declare the printer language.
+
+## Third-party software
+
+The bundled `bin/sm` executable is SumatraPDF 3.4.6, used for unattended PDF printing. SumatraPDF is distributed under GPLv3/AGPLv3 terms; downstream distributors are responsible for satisfying those terms. See [THIRD_PARTY_LICENSES.md](THIRD_PARTY_LICENSES.md).
 
 ## License
-Code: (c) 2023 - Present Alfian Lensun.
 
-MIT where applicable.
+Plugin source code is MIT licensed. See [LICENSE](LICENSE).

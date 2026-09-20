@@ -1,6 +1,6 @@
 {
   "name": "tauri-plugin-printer",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "author": "Alfian Lensun <alfianlensundev@gmail.com>",
   "description": "Tauri v2 plugin for printer discovery, PDF/HTML printing, and print queue management on Windows",
   "license": "MIT",

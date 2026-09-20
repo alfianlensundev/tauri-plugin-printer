@@ -18,6 +18,7 @@ pub struct PrinterItem {
 }
 
 #[derive(Debug, Deserialize)]
+#[cfg(target_os = "windows")]
 pub(crate) struct PrinterRaw {
     #[serde(rename = "Name")]
     pub name: Option<String>,
@@ -65,6 +66,7 @@ pub struct PrintJob {
 }
 
 #[derive(Debug, Deserialize)]
+#[cfg(target_os = "windows")]
 pub(crate) struct PrintJobRaw {
     #[serde(rename = "DocumentName")]
     pub document_name: Option<String>,
@@ -106,6 +108,7 @@ pub struct PrinterCapabilities {
 }
 
 #[derive(Debug, Deserialize)]
+#[cfg(target_os = "windows")]
 pub(crate) struct PrinterCapabilitiesRaw {
     #[serde(rename = "PrinterName")]
     pub printer_name: Option<String>,

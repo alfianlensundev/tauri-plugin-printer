@@ -22,8 +22,8 @@ Windows is currently the only supported platform. The bundled PDF renderer is Su
 Keep the Rust crate and JavaScript package on the same major and minor version.
 
 ```sh
-cargo add tauri-plugin-printer@2
-pnpm add tauri-plugin-printer@2
+cargo add tauri-plugin-printer@2.0.0
+pnpm add tauri-plugin-printer@2.0.0
 ```
 
 Register the plugin:

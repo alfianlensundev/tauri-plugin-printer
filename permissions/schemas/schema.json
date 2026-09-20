@@ -49,7 +49,7 @@
           "minimum": 1.0
         },
         "description": {
-          "description": "Human-readable description of what the permission does. Tauri convention is to use <h4> headings in markdown content for Tauri documentation generation purposes.",
+          "description": "Human-readable description of what the permission does. Tauri convention is to use `<h4>` headings in markdown content for Tauri documentation generation purposes.",
           "type": [
             "string",
             "null"
@@ -111,7 +111,7 @@
           "type": "string"
         },
         "description": {
-          "description": "Human-readable description of what the permission does. Tauri internal convention is to use <h4> headings in markdown content for Tauri documentation generation purposes.",
+          "description": "Human-readable description of what the permission does. Tauri internal convention is to use `<h4>` headings in markdown content for Tauri documentation generation purposes.",
           "type": [
             "string",
             "null"
@@ -295,29 +295,184 @@
       "type": "string",
       "oneOf": [
         {
+          "description": "Enables the get_default_printer command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-get-default-printer",
+          "markdownDescription": "Enables the get_default_printer command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the get_default_printer command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-get-default-printer",
+          "markdownDescription": "Denies the get_default_printer command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the get_job command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-get-job",
+          "markdownDescription": "Enables the get_job command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the get_job command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-get-job",
+          "markdownDescription": "Denies the get_job command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the get_jobs command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-get-jobs",
+          "markdownDescription": "Enables the get_jobs command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the get_jobs command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-get-jobs",
+          "markdownDescription": "Denies the get_jobs command without any pre-configured scope."
+        },
+        {
           "description": "Enables the get_printer command without any pre-configured scope.",
           "type": "string",
-          "const": "allow-get-printer"
+          "const": "allow-get-printer",
+          "markdownDescription": "Enables the get_printer command without any pre-configured scope."
         },
         {
           "description": "Denies the get_printer command without any pre-configured scope.",
           "type": "string",
-          "const": "deny-get-printer"
+          "const": "deny-get-printer",
+          "markdownDescription": "Denies the get_printer command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the get_printer_capabilities command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-get-printer-capabilities",
+          "markdownDescription": "Enables the get_printer_capabilities command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the get_printer_capabilities command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-get-printer-capabilities",
+          "markdownDescription": "Denies the get_printer_capabilities command without any pre-configured scope."
         },
         {
           "description": "Enables the get_printers command without any pre-configured scope.",
           "type": "string",
-          "const": "allow-get-printers"
+          "const": "allow-get-printers",
+          "markdownDescription": "Enables the get_printers command without any pre-configured scope."
         },
         {
           "description": "Denies the get_printers command without any pre-configured scope.",
           "type": "string",
-          "const": "deny-get-printers"
+          "const": "deny-get-printers",
+          "markdownDescription": "Denies the get_printers command without any pre-configured scope."
         },
         {
-          "description": "Default permissions for the plugin",
+          "description": "Enables the pause_job command without any pre-configured scope.",
           "type": "string",
-          "const": "default"
+          "const": "allow-pause-job",
+          "markdownDescription": "Enables the pause_job command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the pause_job command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-pause-job",
+          "markdownDescription": "Denies the pause_job command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the print_pdf command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-print-pdf",
+          "markdownDescription": "Enables the print_pdf command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the print_pdf command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-print-pdf",
+          "markdownDescription": "Denies the print_pdf command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the print_pdf_data command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-print-pdf-data",
+          "markdownDescription": "Enables the print_pdf_data command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the print_pdf_data command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-print-pdf-data",
+          "markdownDescription": "Denies the print_pdf_data command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the remove_job command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-remove-job",
+          "markdownDescription": "Enables the remove_job command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the remove_job command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-remove-job",
+          "markdownDescription": "Denies the remove_job command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the restart_job command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-restart-job",
+          "markdownDescription": "Enables the restart_job command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the restart_job command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-restart-job",
+          "markdownDescription": "Denies the restart_job command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the resume_job command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-resume-job",
+          "markdownDescription": "Enables the resume_job command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the resume_job command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-resume-job",
+          "markdownDescription": "Denies the resume_job command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the set_default_printer command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-set-default-printer",
+          "markdownDescription": "Enables the set_default_printer command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the set_default_printer command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-set-default-printer",
+          "markdownDescription": "Denies the set_default_printer command without any pre-configured scope."
+        },
+        {
+          "description": "Read-only access to installed printers, capabilities, and print jobs\n#### This default permission set includes:\n\n- `allow-get-printers`\n- `allow-get-printer`\n- `allow-get-default-printer`\n- `allow-get-printer-capabilities`\n- `allow-get-jobs`\n- `allow-get-job`",
+          "type": "string",
+          "const": "default",
+          "markdownDescription": "Read-only access to installed printers, capabilities, and print jobs\n#### This default permission set includes:\n\n- `allow-get-printers`\n- `allow-get-printer`\n- `allow-get-default-printer`\n- `allow-get-printer-capabilities`\n- `allow-get-jobs`\n- `allow-get-job`"
+        },
+        {
+          "description": "Allows submitting PDF data or an existing PDF file to a printer\n#### This permission set includes:\n\n- `allow-print-pdf`\n- `allow-print-pdf-data`",
+          "type": "string",
+          "const": "printing",
+          "markdownDescription": "Allows submitting PDF data or an existing PDF file to a printer\n#### This permission set includes:\n\n- `allow-print-pdf`\n- `allow-print-pdf-data`"
+        },
+        {
+          "description": "Allows pausing, resuming, restarting, and removing print jobs\n#### This permission set includes:\n\n- `allow-pause-job`\n- `allow-resume-job`\n- `allow-restart-job`\n- `allow-remove-job`",
+          "type": "string",
+          "const": "job-management",
+          "markdownDescription": "Allows pausing, resuming, restarting, and removing print jobs\n#### This permission set includes:\n\n- `allow-pause-job`\n- `allow-resume-job`\n- `allow-restart-job`\n- `allow-remove-job`"
+        },
+        {
+          "description": "Allows changing the Windows default printer\n#### This permission set includes:\n\n- `allow-set-default-printer`",
+          "type": "string",
+          "const": "default-printer-management",
+          "markdownDescription": "Allows changing the Windows default printer\n#### This permission set includes:\n\n- `allow-set-default-printer`"
         }
       ]
     }

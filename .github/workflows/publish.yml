@@ -1,0 +1,183 @@
+name: Publish packages
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: publish-${{ github.event.release.tag_name }}
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    name: Verify release
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout release tag
+        uses: actions/checkout@v6
+
+      - name: Install Linux dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libwebkit2gtk-4.1-dev \
+            libappindicator3-dev \
+            librsvg2-dev \
+            patchelf
+
+      - name: Setup Rust
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: stable
+          components: rustfmt, clippy
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Validate release versions
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: |
+          node <<'NODE'
+          const fs = require('fs')
+
+          const releaseVersion = process.env.RELEASE_TAG.replace(/^v/, '')
+          const cargo = fs.readFileSync('Cargo.toml', 'utf8')
+          const cargoVersion = cargo.match(/^version\s*=\s*"([^"]+)"/m)?.[1]
+          const npmVersion = JSON.parse(fs.readFileSync('package.json', 'utf8')).version
+
+          if (!cargoVersion) {
+            throw new Error('Version Cargo.toml tidak ditemukan')
+          }
+
+          if (cargoVersion !== releaseVersion || npmVersion !== releaseVersion) {
+            throw new Error(
+              `Version tidak sama: tag=${releaseVersion}, cargo=${cargoVersion}, npm=${npmVersion}`,
+            )
+          }
+
+          console.log(`Version ${releaseVersion} valid`)
+          NODE
+
+      - name: Verify Rust package
+        run: |
+          cargo fmt --all -- --check
+          cargo check
+          cargo test
+          cargo clippy --all-targets -- -D warnings
+          cargo publish --dry-run
+
+      - name: Install JavaScript dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Verify npm package
+        run: |
+          npm run build
+          npm pack --dry-run
+
+  verify-windows:
+    name: Verify Windows backend
+    runs-on: windows-latest
+    steps:
+      - name: Checkout release tag
+        uses: actions/checkout@v6
+
+      - name: Setup Rust
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: stable
+          components: rustfmt, clippy
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Verify Windows Rust backend
+        run: |
+          cargo fmt --all -- --check
+          cargo check
+          cargo test
+          cargo clippy --all-targets -- -D warnings
+
+      - name: Verify JavaScript package
+        run: |
+          bun install --frozen-lockfile
+          npm run build
+          npm pack --dry-run
+
+  publish-cargo:
+    name: Publish to crates.io
+    needs: [verify, verify-windows]
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout release tag
+        uses: actions/checkout@v6
+
+      - name: Install Linux dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libwebkit2gtk-4.1-dev \
+            libappindicator3-dev \
+            librsvg2-dev \
+            patchelf
+
+      - name: Setup Rust
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: stable
+
+      - name: Publish crate
+        run: cargo publish
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+
+  publish-npm:
+    name: Publish to npm
+    needs: [verify, verify-windows]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Checkout release tag
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+
+      - name: Update npm for trusted publishing
+        run: npm install --global npm@^11.15.0
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Install JavaScript dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Build npm package
+        run: npm run build
+
+      - name: Publish stable package
+        if: ${{ !github.event.release.prerelease }}
+        run: npm publish --access public
+
+      - name: Publish prerelease package
+        if: ${{ github.event.release.prerelease }}
+        run: npm publish --access public --tag next

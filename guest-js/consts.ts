@@ -1,6 +1,6 @@
 export const jobStatus: any = {
     512: {
-        name: "Completed",
+        name: "Blocked",
         description: "An error condition, possibly on a print job that precedes this one in the queue, blocked the print job."
     },
     4096: {

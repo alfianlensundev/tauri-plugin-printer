@@ -7,7 +7,18 @@ edition = "2021"
 homepage = "https://crates.io/crates/tauri-plugin-printer"
 readme = "README.md"
 rust-version = "1.77.2"
-exclude = ["/examples", "/webview-dist", "/webview-src", "/node_modules"]
+exclude = [
+    "/examples",
+    "/node_modules",
+    "/dist-js",
+    "/guest-js",
+    "/scripts",
+    "/package.json",
+    "/bun.lockb",
+    "/rollup.config.js",
+    "/tsconfig.json",
+    "/yarn.lock"
+]
 links = "tauri-plugin-printer"
 keywords = [
     "tauri",
@@ -26,13 +37,11 @@ repository = "https://github.com/alfianlensundev/tauri-plugin-printer"
 
 [dependencies]
 tauri = { version = "2.0.6" }
-serde = "1.0"
+serde = { version = "1.0", features = ["derive"] }
 sysinfo = "0.32.0"
 serde_json = "1.0.128"
-serde_with = "3.11.0"
 base64 = "0.21.2"
 thiserror = "1.0"
-tokio = { version = "1.41.0", features = ["macros", "rt"] }
 
 [build-dependencies]
 tauri-plugin = { version = "2.0.1", features = ["build"] }

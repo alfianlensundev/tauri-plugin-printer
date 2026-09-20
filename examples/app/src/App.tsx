@@ -1,51 +1,38 @@
-import { useState } from "react";
-import reactLogo from "./assets/react.svg";
-import {get_printer, get_printers} from 'tauri-plugin-printer'
-import "./App.css";
+import { useState } from 'react'
+import { getDefaultPrinter, getPrinters, type Printer } from 'tauri-plugin-printer'
+import './App.css'
 
 function App() {
-  const [greetMsg, setGreetMsg] = useState("");
-  const [name, setName] = useState("");
+  const [printers, setPrinters] = useState<Printer[]>([])
+  const [message, setMessage] = useState('Select refresh to inspect the Windows print system.')
 
-  async function greet() {
-    // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
-    console.log(await get_printers())
+  async function refresh() {
+    try {
+      const [installed, defaultPrinter] = await Promise.all([
+        getPrinters(),
+        getDefaultPrinter(),
+      ])
+      setPrinters(installed)
+      setMessage(defaultPrinter ? `Default: ${defaultPrinter.name}` : 'No default printer configured')
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : String(error))
+    }
   }
 
   return (
     <main className="container">
-      <h1>Welcome to Tauri + React</h1>
-
-      <div className="row">
-        <a href="https://vitejs.dev" target="_blank">
-          <img src="/vite.svg" className="logo vite" alt="Vite logo" />
-        </a>
-        <a href="https://tauri.app" target="_blank">
-          <img src="/tauri.svg" className="logo tauri" alt="Tauri logo" />
-        </a>
-        <a href="https://reactjs.org" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <p>Click on the Tauri, Vite, and React logos to learn more.</p>
-
-      <form
-        className="row"
-        onSubmit={(e) => {
-          e.preventDefault();
-          greet();
-        }}
-      >
-        <input
-          id="greet-input"
-          onChange={(e) => setName(e.currentTarget.value)}
-          placeholder="Enter a name..."
-        />
-        <button type="submit">Greet</button>
-      </form>
-      <p>{greetMsg}</p>
+      <h1>Tauri Printer v2</h1>
+      <p>{message}</p>
+      <button type="button" onClick={refresh}>Refresh printers</button>
+      <ul>
+        {printers.map((printer) => (
+          <li key={printer.id}>
+            {printer.name}{printer.is_default ? ' (default)' : ''}
+          </li>
+        ))}
+      </ul>
     </main>
-  );
+  )
 }
 
-export default App;
+export default App

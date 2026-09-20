@@ -1,3 +1,30 @@
 [default]
-description = "Default permissions for the plugin"
-permissions = ["allow-get-printers"]
+description = "Read-only access to installed printers, capabilities, and print jobs"
+permissions = [
+  "allow-get-printers",
+  "allow-get-printer",
+  "allow-get-default-printer",
+  "allow-get-printer-capabilities",
+  "allow-get-jobs",
+  "allow-get-job",
+]
+
+[[set]]
+identifier = "printing"
+description = "Allows submitting PDF data or an existing PDF file to a printer"
+permissions = ["allow-print-pdf", "allow-print-pdf-data"]
+
+[[set]]
+identifier = "job-management"
+description = "Allows pausing, resuming, restarting, and removing print jobs"
+permissions = [
+  "allow-pause-job",
+  "allow-resume-job",
+  "allow-restart-job",
+  "allow-remove-job",
+]
+
+[[set]]
+identifier = "default-printer-management"
+description = "Allows changing the Windows default printer"
+permissions = ["allow-set-default-printer"]

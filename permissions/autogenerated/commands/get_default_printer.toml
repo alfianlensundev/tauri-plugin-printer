@@ -1,0 +1,13 @@
+# Automatically generated - DO NOT EDIT!
+
+"$schema" = "../../schemas/schema.json"
+
+[[permission]]
+identifier = "allow-get-default-printer"
+description = "Enables the get_default_printer command without any pre-configured scope."
+commands.allow = ["get_default_printer"]
+
+[[permission]]
+identifier = "deny-get-default-printer"
+description = "Denies the get_default_printer command without any pre-configured scope."
+commands.deny = ["get_default_printer"]
